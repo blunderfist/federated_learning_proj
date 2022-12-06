@@ -81,11 +81,3 @@ def custom_EN_b0(args):
     # model.classifier[1].out_features = args.num_classes
     # summary(ENb0, (3,224,224))
     return model
-
-
-# custom_EN_b0(9)
-# summary(custom_EN_b0(9), (3,224,224))
-# print(EN_b0(9))
-# print(type(EN_b0(9)) == type(VGG(9)))
-# print("custom type: ", type(EN_b0(9)))
-# print("vgg19 type: ", type(VGG(9)))
