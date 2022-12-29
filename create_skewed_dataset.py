@@ -8,7 +8,7 @@ def del_dir_if_exist():
 	"""deletes directories and all contents if they already exist"""
 	skewed_data_dir = r'skewed_dataset'
 	# deletes existing skewed data directory if it exists
-	if os.path.exists(os.path.join(os.getcwd(), skewed_data_dir)):
+	if os.path.exists(skewed_data_dir):
 		shutil.rmtree(os.path.join(os.getcwd(), skewed_data_dir))
 
 
@@ -18,15 +18,15 @@ def create_client_dirs(dir_glob, num_clients = 5):
 	args:
 		dir_glob: directory to pull class names from
 		num_clients: int, how many clients
-	returns;
+	returns:
 		None, creates new empty directories to be filled later
 	"""
 
 	clients = range(1, num_clients + 1)
 	for client in clients:
 		for directory in dir_glob:
-#             os.mkdir(os.path.join('skewed_dataset',f'client_{client}',os.path.basename(os.path.normpath(directory))))
-			print("Created _______", os.path.join('skewed_dataset',f'client_{client}',os.path.basename(os.path.normpath(directory))))
+			os.makedirs(os.path.join(os.getcwd(), 'skewed_dataset',f'client_{client}','train',os.path.basename(os.path.normpath(directory))))
+			print("Created _______", os.path.join('skewed_dataset',f'client_{client}','train',os.path.basename(os.path.normpath(directory))))
 	print("All directories created succesfully\n")
 
 
@@ -75,9 +75,9 @@ def skew_and_distribute_imgs(dir_glob, num_clients):
 		for img in for_skewed:
 			class_name = os.path.basename(os.path.dirname(img))
 			# print(img)
-			# print(os.path.join(os.getcwd(),'skewed_dataset',f'client_{i}','train',class_name,os.path.basename(img)))
-			# dst = os.path.join(os.getcwd(),'skewed_dataset',f'client_{i}','train',class_name,os.path.basename(img))
-			# shutil.copy(img, dst)
+			# print(os.path.join(os.getcwd(),'skewed_dataset',f'client_{i+1}','train',class_name,os.path.basename(img)))
+			dst = os.path.join(os.getcwd(),'skewed_dataset',f'client_{i+1}','train',class_name,os.path.basename(img))
+			shutil.copy(img, dst)
 		print(f"Skewing {class_name}")
 		print(f"Client {i}:\tAdded {len(for_skewed)} images to {class_name}\n")
    
@@ -92,19 +92,20 @@ def skew_and_distribute_imgs(dir_glob, num_clients):
 			last_files = len(idx_of_remaining) % (num_clients - 1)
 		start_idx = 0
 		end_idx = 0
-		remaining_clients = list(range(num_clients))
+		remaining_clients = list(range(1, num_clients + 1))
 		remaining_clients.pop(i)
 		print(f"Evenly splitting remainder of {class_name} to remaining clients")
 		for split in remaining_clients:
 			if split != remaining_clients[-1]:
+
 				# print(split)
 				other_idx = not_for_skewed[start_idx:end_idx + even_split]
 				for img in other_idx:
 					class_name = os.path.basename(os.path.dirname(img))
 					# print(img)
 					# print(os.path.join(os.getcwd(),'skewed_dataset',f'client_{split}','train',class_name,os.path.basename(img)))
-					# dst = os.path.join(os.getcwd(),'skewed_dataset',f'client_{split}','train',class_name,os.path.basename(img))
-					# shutil.copy(img, dst)
+					dst = os.path.join(os.getcwd(),'skewed_dataset',f'client_{split}','train',class_name,os.path.basename(img))
+					shutil.copy(img, dst)
 				print(f"Client {split}:\tAdded {len(other_idx)} images to {class_name}")
 				start_idx += even_split
 				end_idx += even_split
@@ -114,8 +115,8 @@ def skew_and_distribute_imgs(dir_glob, num_clients):
 					class_name = os.path.basename(os.path.dirname(img))
 					# print(img)
 					# print(os.path.join(os.getcwd(),'skewed_dataset',f'client_{split}','train',class_name,os.path.basename(img)))
-					# dst = os.path.join(os.getcwd(),'skewed_dataset',f'client_{split}','train',class_name,os.path.basename(img))
-					# shutil.copy(img, dst)
+					dst = os.path.join(os.getcwd(),'skewed_dataset',f'client_{split}','train',class_name,os.path.basename(img))
+					shutil.copy(img, dst)
 				print(f"Client {split}:\tAdded {len(other_idx)} images to {class_name}")
 				print('\n')
 
@@ -128,8 +129,9 @@ def skew_and_distribute_imgs(dir_glob, num_clients):
 	print(f"\n{'#'*15} Remaining classes to be evenly split between clients {'#'*15}\n")
 
 	for i in remaining_classes:
-		print(f'Class {os.path.basename(os.path.dirname(i))} has {len(i)} images')
+		print(f'Class {os.path.basename(os.path.dirname(i))} has {len(os.listdir(i))} images')
 		lst_of_lst_of_files_not_to_skew.append(glob(os.path.join(i, '*')))
+
 	print(f"\n{'#'*15} Adding remaining classes evenly split between clients {'#'*15}\n")
 
 	for i in range(len(lst_of_lst_of_files_not_to_skew)):
@@ -144,17 +146,17 @@ def skew_and_distribute_imgs(dir_glob, num_clients):
 			last_files = len(even_split_class) % num_clients
 		start_idx = 0
 		end_idx = 0
-		remaining_clients = list(range(num_clients))
+		remaining_clients = list(range(1, num_clients + 1))
 		# print(f"{'#'*15}Evenly splitting {} between clients{'#'*15}")
 		for split in range(num_clients):
 			if split != (num_clients-1):
 				other_idx = even_split_class[start_idx:end_idx + even_split]
 				for img in other_idx:
 					class_name = os.path.basename(os.path.dirname(img))
-	                # print(os.path.join(os.getcwd(),'skewed_dataset',f'client_{split}','train',class_name,os.path.basename(img)))
-					# dst = os.path.join(os.getcwd(),'skewed_dataset',f'client_{split}','train',class_name,os.path.basename(img))
-					# shutil.copy(img, dst)
-				print(f"Client {split}:\tAdded {len(other_idx)} images to {class_name}")
+	                # print(os.path.join(os.getcwd(),'skewed_dataset',f'client_{split+1}','train',class_name,os.path.basename(img)))
+					dst = os.path.join(os.getcwd(),'skewed_dataset',f'client_{split+1}','train',class_name,os.path.basename(img))
+					shutil.copy(img, dst)
+				print(f"Client {split+1}:\tAdded {len(other_idx)} images to {class_name}")
 				start_idx += even_split
 				end_idx += even_split
 
@@ -162,10 +164,10 @@ def skew_and_distribute_imgs(dir_glob, num_clients):
 				other_idx = even_split_class[start_idx:end_idx + even_split + last_files]
 				for img in other_idx:
 					class_name = os.path.basename(os.path.dirname(img))
-					# print(os.path.join(os.getcwd(),'skewed_dataset',f'client_{split}','train',class_name,os.path.basename(img)))
-					# dst = os.path.join(os.getcwd(),'skewed_dataset',f'client_{split}','train',class_name,os.path.basename(img))
-					# shutil.copy(img, dst)
-				print(f"Client {split}:\tAdded {len(other_idx)} images to {class_name}")
+					# print(os.path.join(os.getcwd(),'skewed_dataset',f'client_{split+1}','train',class_name,os.path.basename(img)))
+					dst = os.path.join(os.getcwd(),'skewed_dataset',f'client_{split+1}','train',class_name,os.path.basename(img))
+					shutil.copy(img, dst)
+				print(f"Client {split+1}:\tAdded {len(other_idx)} images to {class_name}")
 				print('\n')
 
 
@@ -176,14 +178,14 @@ def main():
 	Skews and adds data according to specifications"""
 
 	# this needs to be removed when finalized, just for temp working with small dataset
-	data_dir = os.path.join(os.getcwd(), 'd_1', 'train')
+	data_dir = os.path.join(os.getcwd(), 'd_1', 'train') # using for testing purposes
 	# data_dir = os.path.join(os.getcwd(), 'data', 'train') # keep this one when name is finalized
 	dir_glob = glob(os.path.join(data_dir, '*/'))
 
 	# num_clients = int(input("Enter number of clients: "))
 	num_clients = 5 # hardcoding for simplicity
 	print("Deleting directories if they exist")
-	# del_dir_if_exist() # uncomment this when deploying
+	del_dir_if_exist()
 	print("Creating directories...\n")
 	create_client_dirs(dir_glob, num_clients)
 	print("Directories created\n")
