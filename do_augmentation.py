@@ -15,44 +15,38 @@ def augment(image,x):
     gaussian_blurr
     grayscale
     random_affine
-    
-    
     '''
-    
 
     if x == 1:
         image = T.ColorJitter(brightness=.5, hue=.3)(image)
-
-
-
+        
     elif x == 2:
-        image = T.RandomPerspective(distortion_scale=0.6, p=1.0)(image)
-
+        image = T.RandomHorizontalFlip(p = 0.5)(image)
 
     elif x == 3:
-        image = T.RandomRotation(degrees=(0, 180))(image)
-
+        image = T.RandomVerticalFlip(p = 0.5)(image)
 
     elif x == 4:
-        image = T.RandomInvert()(image)
-
-
-    elif x == 5:
-        image = T.GaussianBlur(kernel_size=(5, 9), sigma=(0.1, 5))(image)
+        image = T.RandomRotation(degrees=(0, 359))(image) # need filler here
         
-    elif x == 6:
+    elif x == 5:
         
         image = T.RandomAdjustSharpness(sharpness_factor=2)(image)
         
-    elif x == 7:
+    elif x == 6:
         image = T.RandomAutocontrast()(image)
-        
-    elif x == 8:
 
+    # elif x == 7:
+    #     image = T.RandomPerspective(distortion_scale=0.6, p=1.0)(image)
+
+    # elif x == 8:
+    #     image = T.RandomInvert()(image)
+
+    # elif x == 9:
+    #     image = T.GaussianBlur(kernel_size=(5, 9), sigma=(0.1, 5))(image)
+        
+    else:
         
         image = image
-    
-    
-    
 
     return T.ToTensor()(image)
