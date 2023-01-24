@@ -14,6 +14,10 @@ Contents:
 
  Some additional helper files have been included.
  
+ ## Dataset
+ 
+ https://www.kaggle.com/datasets/nodoubttome/skin-cancer9-classesisic
+ 
  ## To run
  
  From the terminal enter <code>py .\s2kew_fl_kfold2.py --model custom_EN_b0_v3</code>
