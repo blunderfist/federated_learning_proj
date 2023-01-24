@@ -4,6 +4,8 @@ import numpy as np
 import shutil
 
 
+np.random.seed(1)
+
 def del_dir_if_exist():
 	"""deletes directories and all contents if they already exist"""
 	skewed_data_dir = r'skewed_dataset'
