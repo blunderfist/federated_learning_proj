@@ -24,7 +24,10 @@ Contents:
 - Powershell ```Expand-Archive -Path archive.zip -DestinationPath data```
 - MAC OS ```ditto -xk archive.zip data```
  
+ To skew the dataset run.
+ ```py split_and_skew_the_data.py```
 
+This script must be in the same directory containing /data.
  
  ## To run
  
