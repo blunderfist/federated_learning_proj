@@ -250,9 +250,9 @@ def main():
 
 	# this needs to be removed when finalized, just for temp working with small dataset
 	# data_dir = os.path.join(os.getcwd(), 'data', 'train') # using for testing purposes
-	data_dir = os.path.join(os.getcwd(), 'data', 'Train') # keep this one when name is finalized
+	data_dir = os.path.join(os.getcwd(), 'data', 'Skin cancer ISIC The International Skin Imaging Collaboration', 'Train') # keep this one when name is finalized
 	dir_glob = glob(os.path.join(data_dir, '*/'))
-
+	# print(dir_glob)
 	# num_clients = int(input("Enter number of clients: "))
 	num_clients = 5 # hardcoding for simplicity
 
@@ -266,7 +266,7 @@ def main():
 	# print("Splitting data into train/val/test sets")
 	# train_test_split(dir_glob, test_size = 10, val_set = False)
 
-	print("\n\nSkeweing dataset...\n\n")
+	print("\n\nSkewing dataset...\n\n")
 	skew_and_distribute_imgs(dir_glob, num_clients)
 	print("\n\nSkewed dataset created\n\n")
 
