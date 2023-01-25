@@ -20,6 +20,8 @@ Contents:
  Dataset available from Kaggle https://www.kaggle.com/datasets/nodoubttome/skin-cancer9-classesisic
  [Go to dataset here](https://www.kaggle.com/datasets/nodoubttome/skin-cancer9-classesisic)
  
+ For this project the data must be skewed across each client. One client will have 50% of a class, chosen at random, and the remaineder of that class is split evenly across the remaining clients. split_and_skew_the_data.py will perform this for you but first the data must be downloaded and extracted as follows.
+ 
  It's a zipped file and the code to skew it will look for data in the /data directory, so make sure it's unzipped into this directory:
 - Linux ```unzip archive.zip -d data```
 - Powershell ```Expand-Archive -Path archive.zip -DestinationPath data```
