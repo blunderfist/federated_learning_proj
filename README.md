@@ -5,9 +5,9 @@
 Code for federated learning project.
 
 Contents:
- - About
+ - [About](##-About)
  - [Dataset](##-Dataset)
- - To run
+ - [To run](##-To-Run)
  
  ## About
  
