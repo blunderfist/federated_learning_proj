@@ -16,7 +16,15 @@ Contents:
  
  ## Dataset
  
- https://www.kaggle.com/datasets/nodoubttome/skin-cancer9-classesisic
+ Dataset available from Kaggle https://www.kaggle.com/datasets/nodoubttome/skin-cancer9-classesisic
+ [Go to dataset here](https://www.kaggle.com/datasets/nodoubttome/skin-cancer9-classesisic)
+ 
+ It's a zipped file and the code to skew it will look for data in the /data directory, so make sure it's unzipped into this directory:
+- Linux ```unzip archive.zip -d data```
+- Powershell ```Expand-Archive -Path archive.zip -DestinationPath data```
+- MAC OS ```ditto -xk archive.zip data```
+ 
+
  
  ## To run
  
