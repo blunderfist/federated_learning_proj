@@ -123,7 +123,8 @@ def skew_and_distribute_imgs(dir_glob, num_clients):
 	print(f"\n{'#'*15} Classes to be skewed between clients {'#'*15}\n")
 
 	for i in selected_classes_to_skew:
-		print(f'Class {os.path.basename(os.path.dirname(i))} has {len(i)} images')
+		# print(f'Class {os.path.basename(os.path.dirname(i))} has {len(i)} images')
+		print(f'Class {os.path.basename(os.path.dirname(i))}')
 		lst_of_lst_of_files_to_skew.append(glob(os.path.join(i, '*')))
 		# print(glob(os.path.join(i, '*')))
 
@@ -248,8 +249,8 @@ def main():
 	Skews and adds data according to specifications"""
 
 	# this needs to be removed when finalized, just for temp working with small dataset
-	data_dir = os.path.join(os.getcwd(), 'data', 'train') # using for testing purposes
-	# data_dir = os.path.join(os.getcwd(), 'data', 'Train') # keep this one when name is finalized
+	# data_dir = os.path.join(os.getcwd(), 'data', 'train') # using for testing purposes
+	data_dir = os.path.join(os.getcwd(), 'data', 'Train') # keep this one when name is finalized
 	dir_glob = glob(os.path.join(data_dir, '*/'))
 
 	# num_clients = int(input("Enter number of clients: "))
