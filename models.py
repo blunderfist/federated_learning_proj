@@ -17,13 +17,13 @@ def EfficientNet(args):
     
     return model
 
-def InceptionNetV3(args):
+# def InceptionNetV3(args):
     
-    model = torchvision.models.inception_v3(pretrained=True)
-    model.classifier[1].out_features = args.num_classes
-    model.aux_logit=False
+#     model = torchvision.models.inception_v3(pretrained=True)
+#     model.classifier[1].out_features = args.num_classes
+#     model.aux_logit=False
 
-    return model
+#     return model
 
 def ResNet(args):
     
@@ -48,7 +48,7 @@ def EfficientNet_b0(args):
     return model
 
 
-# our modified EfficientNet b0 model
+# other paper's modified EfficientNet b0 model
 
 class Mod_EfficientNet_b0(nn.Module):
 
@@ -109,7 +109,15 @@ def custom_EN_b0():
     # summary(ENb0, (3,224,224))
     return model
 
-# another modified version
+
+
+
+#################################################################
+# our version which outperforms above version from other paper
+#################################################################
+
+# this code block is super messy with commented out code but will be cleaned up as soon as some testing is done to figure out what is not required
+
 class Mod_EfficientNet_b0_v2(nn.Module):
 
     def __init__(self):
@@ -117,44 +125,55 @@ class Mod_EfficientNet_b0_v2(nn.Module):
         
         #  super(EfficientNet_b0, self).__init__() is used to inherit nn.Module used above.
         self.model = efficientnet_pytorch.EfficientNet.from_pretrained('efficientnet-b0')
-        self.swish_beta = 
+        # self.swish_beta = 
         self.conv1x1 = nn.Conv2d(16, 1024, 1)
-        self.linear_1 = nn.Linear(1024 , 640)
-        self.bn_dro_1 = nn.Sequential(
-            # nn.BatchNorm1d(640),
-            nn.Dropout(0.8),
-            )
-        self.linear_2 = nn.Linear(640 , 400)
-        self.swish = nn.SiLU()
-        # self.sigmoid = nn.Sigmoid()
-        self.bn_dro_2 = nn.Sequential(
-            # nn.BatchNorm1d(400),
+        # self.linear_1 = nn.Linear(1024 , 640)
+        # self.dro_1 = nn.Sequential(
+        #     # nn.BatchNorm1d(640),
+        #     nn.Dropout(0.8), # alt 7
+        #     )
+        # self.dro_1 = nn.Dropout(0.8) # alt 7
+
+        # self.linear_2 = nn.Linear(640 , 400)
+        # self.swish = nn.SiLU()
+        # self.dro_2 = nn.Dropout(0.5) # alt 4.375
+
+        # self.linear_3 = nn.Linear(400 , 250)
+        # self.dro_3 = nn.Dropout(0.3), # alt 2.73
+
+        # self.classifier_layer = nn.Linear(250 , 9)
+
+        self.classifier_layer = nn.Sequential(
+            # nn.Conv2d(16, 1024, 1),
+            # nn.AvgPool2d(1), # giving issues, removing for now, may not be needed for model
+            nn.Linear(1024 , 640),
+            nn.SiLU(),
+            # nn.BatchNorm1d(512),
             nn.Dropout(0.5),
-            )
-        self.linear_3 = nn.Linear(400 , 250)
-        self.bn_dro_3 = nn.Sequential(
-            # nn.BatchNorm1d(250),
+            nn.Linear(640 , 400),
+            nn.SiLU(),
+            # nn.BatchNorm1d(256),
             nn.Dropout(0.3),
+            nn.Linear(250 , 9)
             )
-        self.classifier_layer = nn.Linear(250 , 9)
+
 
     # forward function of Efficient-Net model 
     def forward(self, inputs):
         x = self.model.extract_features(inputs)
         x = self.model._avg_pooling(x)
-        x = x.flatten(start_dim=1)
-        x = self.model._dropout(x)
-        # x = self.classifier_layer(x)
-        x = self.linear_1(x)
-        x = self.swish(x)
-        # x = x * nn.Sigmoid(0.5 * x)
-        x = self.bn_dro_1(x)
-        x = self.linear_2(x)
-        x = self.swish(x)
-        x = self.bn_dro_2(x)
-        x = self.linear_3(x)
-        x = self.swish(x)
-        x = self.bn_dro_3(x)        
+        x = self.conv1x1(x)
+        x = x.flatten(start_dim = 1)
+        # x = self.model._dropout(x)
+        # x = self.linear_1(x)
+        # x = self.swish(x)
+        # x = self.bn_dro_1(x)
+        # x = self.linear_2(x)
+        # x = self.swish(x)
+        # x = self.bn_dro_2(x)
+        # x = self.linear_3(x)
+        # x = self.swish(x)
+        # x = self.bn_dro_3(x)        
         x = self.classifier_layer(x)
         
         return x
