@@ -121,7 +121,7 @@ def custom_EN_b0():
 class Mod_EfficientNet_b0_v2(nn.Module):
 
     def __init__(self):
-        super(Mod_EfficientNet_b0, self).__init__()
+        super(Mod_EfficientNet_b0_v2, self).__init__()
         
         #  super(EfficientNet_b0, self).__init__() is used to inherit nn.Module used above.
         self.model = efficientnet_pytorch.EfficientNet.from_pretrained('efficientnet-b0')
