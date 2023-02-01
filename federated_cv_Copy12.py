@@ -258,7 +258,7 @@ def build_train_set_lst():
         # my laptop
         # tmp_train_set =  SkinCancer(os.path.join('..',f'{skewed_datasets[i]}','train'), transform = None)
         # hpc
-        tmp_train_set =  SkinCancer(os.path.join('data_skewed',f'{skewed_datasets[i]}','train'), transform = None)
+        tmp_train_set =  SkinCancer(os.path.join('skewed_dataset',f'{skewed_datasets[i]}','train'), transform = None)
         train_set_lst.append(tmp_train_set)
     # print("train_set_lst",train_set_lst)
     # skewed_lst = {k:v for k,v in zip(train_set_lst, range(len(skewed_datasets)))} # works but modifying below
@@ -303,7 +303,7 @@ def get_train_set(client_idx):
     # my comp
     # train_set = SkinCancer(os.path.join('..',f'{skewed_datasets[client_idx]}','train'), transform = None)
     # hpc
-    train_set = SkinCancer(os.path.join('data_skewed',f'{skewed_datasets[client_idx]}','train'), transform = None)
+    train_set = SkinCancer(os.path.join('skewed_dataset',f'{skewed_datasets[client_idx]}','train'), transform = None)
 
     return train_set
 
@@ -671,6 +671,11 @@ if __name__ == '__main__':
 
 #PYCM SECTION
 ###############################################################################################################
+                if not os.path.exists(os.path.join(os.getcwd(), 'skewed_results','global_results')):
+                    os.mkdir(os.path.join(os.getcwd(), 'skewed_results','global_results'))
+                if not os.path.exists(os.path.join(os.getcwd(), 'skewed_results','local_results')):
+                    os.mkdir(os.path.join(os.getcwd(), 'skewed_results','local_results'))    
+                
                 cm = pycm.ConfusionMatrix(y_t, y_p, digit = 5)
                 # class_label_names = {k:v for k,v in zip (range(0,len(train_set[0].classes)), train_set[0].classes)}
                 # cm.relabel(mapping = class_label_names)
@@ -794,6 +799,8 @@ if __name__ == '__main__':
 
 #PYCM SECTION INFERENCE AFTER TRAINING
 ###############################################################################################################
+
+
         cm = pycm.ConfusionMatrix(y_t, y_p, digit = 5)
         # class_label_names = {k:v for k,v in zip (range(0,len(train_set[0].classes)), train_set[0].classes)}
         # cm.relabel(mapping = class_label_names)
@@ -872,6 +879,8 @@ if __name__ == '__main__':
     # my laptop
     # torch.save(GLOBAL_MODEL.state_dict(),(os.path.join('..','results','federated_skewed',f'{global_model._get_name()}_{args.optimizer}_FINAL_WEIGHTS.pth'))
     # hpc
+    # if not os.path.exists(os.path.join(os.getcwd(), 'skewed_results','global_results')):
+    #     os.mkdir(os.path.join(os.getcwd(), 'skewed_results','global_results'))
     torch.save(GLOBAL_MODEL.state_dict(),(os.path.join('skewed_results','global_results',f'{global_model._get_name()}_{args.optimizer}_FINAL_WEIGHTS.pth')))
     # kaggle
     # torch.save(GLOBAL_MODEL.state_dict(),(os.path.join(f'{global_model._get_name()}_{args.optimizer}_FINAL_WEIGHTS.pth'))
