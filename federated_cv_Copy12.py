@@ -87,8 +87,8 @@ def test_inference(model, testloader):
 	#         device = torch.device("cuda:0" else "cpu")
 	#     # device = 'mps' 
 	# except:
-	# device = 'mps'
-	device = 'cpu'
+	device = 'mps'
+# 	device = 'cpu'
 
 	criterion = nn.CrossEntropyLoss().to(device)
 	# testloader = DataLoader(test_dataset, batch_size=8,
@@ -370,8 +370,8 @@ if __name__ == '__main__':
 	#     # device = 'mps' if args.gpu else 'cpu'
 	# except:
 	#     device = 'cpu'
-	# device = 'mps'
-	device = 'cpu'
+	device = 'mps'
+# 	device = 'cpu'
 	# load dataset and user groups
 	# train_dataset, test_dataset, user_groups = get_dataset(args)
 	
