@@ -27,7 +27,8 @@ from sklearn.model_selection import KFold
 from sklearn.model_selection import train_test_split
 
 from sklearn.metrics import confusion_matrix, f1_score, roc_auc_score, precision_score, recall_score, roc_curve, auc
-from models import EfficientNet, ResNet, VGG, custom_EN_b0, custom_EN_b0_v2, custom_EN_b0_v3
+import models
+from models import EfficientNet, ResNet, VGG, custom_EN_b0, custom_EN_b0_v2#, custom_EN_b0_v3
 # from pycm import *
 import pycm
 
@@ -258,7 +259,7 @@ def build_train_set_lst():
 		# my laptop
 		# tmp_train_set =  SkinCancer(os.path.join('..',f'{skewed_datasets[i]}','train'), transform = None)
 		# hpc
-		tmp_train_set =  SkinCancer(os.path.join('skewed_dataset',f'{skewed_datasets[i]}','train'), transform = None)
+		tmp_train_set =  SkinCancer(os.path.join('..','skewed_dataset',f'{skewed_datasets[i]}','train'), transform = None)
 		train_set_lst.append(tmp_train_set)
 	# print("train_set_lst",train_set_lst)
 	# skewed_lst = {k:v for k,v in zip(train_set_lst, range(len(skewed_datasets)))} # works but modifying below
@@ -303,7 +304,7 @@ def get_train_set(client_idx):
 	# my comp
 	# train_set = SkinCancer(os.path.join('..',f'{skewed_datasets[client_idx]}','train'), transform = None)
 	# hpc
-	train_set = SkinCancer(os.path.join('skewed_dataset',f'{skewed_datasets[client_idx]}','train'), transform = None)
+	train_set = SkinCancer(os.path.join('..','skewed_dataset',f'{skewed_datasets[client_idx]}','train'), transform = None)
 
 	return train_set
 
@@ -342,8 +343,14 @@ def sanity_check_datasets(clients, skewed_ds):
 	print(f"skewed_ds {skewed_ds}")
 
 
-
+   
 #########################################################################################################################
+if not os.path.exists(os.path.join('skewed_results','global_results')):
+	os.makedirs(os.path.join('skewed_results','global_results'))
+if not os.path.exists(os.path.join('skewed_results','local_results')):
+	os.makedirs(os.path.join('skewed_results','local_results')) 
+#########################################################################################################################
+
 
 
 if __name__ == '__main__':
@@ -363,8 +370,8 @@ if __name__ == '__main__':
 	#     # device = 'mps' if args.gpu else 'cpu'
 	# except:
 	#     device = 'cpu'
-	device = 'mps'
-	# device = 'cpu'
+	# device = 'mps'
+	device = 'cpu'
 	# load dataset and user groups
 	# train_dataset, test_dataset, user_groups = get_dataset(args)
 	
@@ -671,10 +678,7 @@ if __name__ == '__main__':
 
 #PYCM SECTION
 ###############################################################################################################
-				if not os.path.exists(os.path.join(os.getcwd(), 'skewed_results','global_results')):
-					os.mkdir(os.path.join(os.getcwd(), 'skewed_results','global_results'))
-				if not os.path.exists(os.path.join(os.getcwd(), 'skewed_results','local_results')):
-					os.mkdir(os.path.join(os.getcwd(), 'skewed_results','local_results'))    
+
 				
 				cm = pycm.ConfusionMatrix(y_t, y_p, digit = 5)
 				# class_label_names = {k:v for k,v in zip (range(0,len(train_set[0].classes)), train_set[0].classes)}
