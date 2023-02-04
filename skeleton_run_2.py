@@ -337,13 +337,16 @@ if __name__ == '__main__':
 
 
 				if epoch == 0:
-					print("epoch should be = 0: ", epoch)
+					print("epoch should be = 0: is", epoch)
 					# global_model.load_state_dict(GLOBAL_MODEL_WEIGHTS)
 					# local_model = LocalUpdate(args=args, dataset=train_dataset,
 					# 					  idxs=client_data, weights = GLOBAL_MODEL_WEIGHTS,
 					# 					  model = global_model, logger=None)                    
 
-				
+
+				# wrong spot updates after each fold
+				# elif epoch != 0: # was == 1
+				# 	print("Averaging weights")				
 				else:
 					print("epoch should be > 0: epoch is", epoch)
 
@@ -352,6 +355,10 @@ if __name__ == '__main__':
 			
 			if epoch != 0: # was == 1
 				print("Averaging weights")
+
+		if epoch == 0: # if the first global epoch is finished we need to update weights before next epoch
+			print("Averaging weights after first global epoch")
+			print("This should only be printed ONCE")
 
 
 	 
