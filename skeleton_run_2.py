@@ -352,9 +352,15 @@ if __name__ == '__main__':
 
 
 
-			
-			if epoch != 0: # was == 1
-				print("Averaging weights")
+			# this was in the correct spot			
+			# if epoch != 0: # was == 1
+			# 	print("Averaging weights")
+
+		# if epoch != 0:
+		# if epoch != 0: # was == 1
+		print("Averaging weights after all 5 folds")
+		print("THIS SHOULD ONLY HAPPEN AT END OF GLOBAL EPOCH")
+
 
 		if epoch == 0: # if the first global epoch is finished we need to update weights before next epoch
 			print("Averaging weights after first global epoch")
