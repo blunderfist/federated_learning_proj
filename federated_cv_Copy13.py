@@ -1,35 +1,33 @@
-import os,sys
+import os
+import sys
 import copy
 import time
-import pickle
 import numpy as np
 from tqdm import tqdm
 import pandas as pd
-from skin_cancer_dataset import SkinCancer
 import matplotlib.pyplot as plt
 import itertools
 import io
+import datetime
+import pickle
+
 import torchmetrics
-# from torchmetrics.functional import precision_recall
 import torch
 from torch import nn
-# from tensorboardX import SummaryWriter
 import torchvision
+from torch.utils.data import Dataset, DataLoader, Subset, random_split, SubsetRandomSampler, ConcatDataset
+
 from options import args_parser
 from _update import LocalUpdate
-# from models import MLP, CNNMnist, CNNFashion_Mnist, CNNCifar
 from utils import get_dataset, average_weights, exp_details
-from torch.utils.data import Dataset, DataLoader
-import datetime
-
-from torch.utils.data import Dataset, DataLoader, Subset, random_split, SubsetRandomSampler, ConcatDataset
-from sklearn.model_selection import KFold
-from sklearn.model_selection import train_test_split
-
-from sklearn.metrics import confusion_matrix, f1_score, roc_auc_score, precision_score, recall_score, roc_curve, auc
+from skin_cancer_dataset import SkinCancer
 import models
 from models import EfficientNet, ResNet, VGG, custom_EN_b0, custom_EN_b0_v2#, custom_EN_b0_v3
-# from pycm import *
+
+from sklearn.model_selection import KFold
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import confusion_matrix, f1_score, roc_auc_score, precision_score, recall_score, roc_curve, auc
+
 import pycm
 
 import warnings
@@ -187,48 +185,9 @@ def test_inference(model, testloader):
 
 
 
-
-# def plot_confusion_matrix(cm, class_names):
-# 	"""
-# 	Returns a matplotlib figure containing the plotted confusion matrix.
-	
-# 	Args:
-# 	   cm (array, shape = [n, n]): a confusion matrix of integer classes
-# 	   class_names (array, shape = [n]): String names of the integer classes
-# 	"""
-	
-# 	figure = plt.figure(figsize=(8, 8))
-# 	plt.imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
-# 	plt.title("Confusion matrix")
-# 	plt.colorbar()
-# 	tick_marks = np.arange(len(class_names))
-# 	plt.xticks(tick_marks, class_names, rotation=45,fontsize=8,horizontalalignment='right')
-# 	plt.yticks(tick_marks, class_names,fontsize=8)
-	
-# 	# Normalize the confusion matrix.
-# 	cm = np.around(cm.astype('float') / cm.sum(axis=1)[:, np.newaxis], decimals=2)
-	
-# 	# Use white text if squares are dark; otherwise black.
-# 	threshold = cm.max() / 2.
-
-# 	for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
-# 		color = "white" if cm[i, j] < threshold else "black"
-# 		plt.text(j, i, cm[i, j], horizontalalignment="center", color=color,fontsize=7)
-		
-# 	plt.tight_layout()
-# 	plt.ylabel('True label')
-# 	plt.xlabel('Predicted label')
-# 	return figure
-
-# 	# return cf_matrix
-	
-
-
-
-
-######################################################################################################################################
+##########################
 # Getting data for runs
-######################################################################################################################################
+##########################
 
 def build_train_set_lst():
 	"""builds list of all skewed datasets"""
@@ -281,6 +240,8 @@ def get_train_set(client_idx):
 
 ###########################################################################################
 # KFOLD CODE
+# we may not need this now that the code has been reworked
+# if possible we should switch to sklearn, probably more robust
 ###########################################################################################
 
 def splice(lst, start_test, stop_test):
@@ -304,6 +265,7 @@ def splice(lst, start_test, stop_test):
 # END KFOLD CODE
 ###########################################################################################
 
+# this was useful early on trying to figure out why data was loading wrong, probably can delete if runs are smooth
 def sanity_check_datasets(clients, skewed_ds):
 	"""maps clients to dataset folders for santity checking all datasets are being used"""
 
@@ -312,14 +274,13 @@ def sanity_check_datasets(clients, skewed_ds):
 	print(f"skewed_ds:\t\t{skewed_ds}")
 
 
-#########################################################################################################################
+###########################################################################
 # Makes directories to save output if they don't exist yet   
-#########################################################################################################################
+###########################################################################
 if not os.path.exists(os.path.join('skewed_results','global_results')):
 	os.makedirs(os.path.join('skewed_results','global_results'))
 if not os.path.exists(os.path.join('skewed_results','local_results')):
 	os.makedirs(os.path.join('skewed_results','local_results')) 
-#########################################################################################################################
 
 
 ######################################################################################################################################
@@ -329,6 +290,7 @@ if not os.path.exists(os.path.join('skewed_results','local_results')):
 if __name__ == '__main__':
 	start_time = time.time()
 
+	# revisit to delete this?
 	# define paths
 	# path_project = os.path.abspath('..')
 	# logger = SummaryWriter('../logs')
@@ -376,7 +338,7 @@ if __name__ == '__main__':
 
 
 ######################################################################################################################################
-# Client's get their data assigned
+# Clients get their data assigned
 ######################################################################################################################################
 	
 	# user_groups = skin_cancer_iid(train_set, 5) # was 2
@@ -441,22 +403,17 @@ if __name__ == '__main__':
 		old_fc = GLOBAL_MODEL.classifier.__getitem__(-1)
 		new_fc = nn.Linear(in_features = old_fc.in_features, out_features = 9, bias = True)
 		GLOBAL_MODEL.classifier.__setitem__(-1 , new_fc)
-	# print(type(GLOBAL_MODEL))
-	# GLOBAL_MODEL.classifier[1].out_features = 9
-	# print(GLOBAL_MODEL.classifier)
 	
 	# Set the model to train and send it to device.
 	GLOBAL_MODEL.to(device)
 	GLOBAL_MODEL.train()
-	# print(global_model)
 	
 	# copy weights
 	GLOBAL_MODEL_WEIGHTS = copy.deepcopy(GLOBAL_MODEL.state_dict())
 	
 	# global_weights = global_model.state_dict()
 
-	train_loss, train_accuracy = [], []
-	
+	train_loss, train_accuracy = [], []	
 	test_loss, test_accuracy = [], []
 	
 	val_acc_list, net_list = [], []
@@ -466,7 +423,6 @@ if __name__ == '__main__':
 	
 	history = {'train_loss': [], 'train_acc': [],
 			   'test_loss': [], 'test_acc': []}
-	
 	history_c={'client_acc':[], 'client_loss':[]}
 				
 	global_model = GLOBAL_MODEL
@@ -490,7 +446,6 @@ if __name__ == '__main__':
 
 	# START GLOBAL EPOCHS
 	for epoch in tqdm(range(int(args.epochs))):
-		# print(f'Model Initialized for fold {epoch}...')
 		local_weights, local_losses, local_acc = [], [], []
 		print(f'\n | Global Training Round : {epoch+1} of {args.epochs}|\n')
 
@@ -503,21 +458,22 @@ if __name__ == '__main__':
 
 		##################################################################
 		# iterating through each client to perform kfold cv for this epoch
+		##################################################################
+
 		for idx in range(args.num_users):
 
 			print(f'Client Index__________{idx+1} __________')
 
 
-		######################################################
-		####    BEGIN KFOLD FOR THIS CLIENT
-		######################################################
+			######################################################
+			####    BEGIN KFOLD FOR THIS CLIENT
+			######################################################
 
 			k = 5 # set K folds
 			for fold in range(k):
 				print(f'Model Initialized for fold {fold+1} of {k}')
 
 				client_data = user_groups[idx][:] # trying to copy all indexes from dataset for given client
-				# print(f'\nclient_#__{idx}\t\t',type(user_groups[idx]),'\n\n')
 				# np.random.shuffle(client_data)
 
 				# this is the new kfold section
@@ -553,19 +509,10 @@ if __name__ == '__main__':
 				test_set = torch.utils.data.Subset(train_set, test_sampler.indices)
 				test_loader = DataLoader(test_set, batch_size=16,shuffle=False)
 
-				
-
-
-				# print("SKEWED DATASET[IDX]",skewed_datasets[idx])
-
-
-				# print("client_data",[type(x) for x in client_data if not type(x) == type(np.int32) ])
-
-				# dataloader = DataLoader(train_dataset, batch_size=16, sampler=train_sampler)
 
 
 				dataloader = DataLoader(train_set, batch_size=16, sampler=train_sampler)
-				print(f'Client Index__________{idx} __________')
+				print(f'Client Index__________{idx+1} __________')
 				if epoch == 0:
 					# print("epoch ==0: epoch is", epoch)
 					global_model.load_state_dict(GLOBAL_MODEL_WEIGHTS)
@@ -613,17 +560,12 @@ if __name__ == '__main__':
 			os.mkdir('fed_models')
 		torch.save(global_model.state_dict(), os.path.join(f'fed_models',f'{global_model._get_name()}_E{epoch}_F{fold}.pth'))
 		AVG_WEIGHTS.append(global_model.state_dict())
-		# print("Averaging the weights!")
+		print(f"{'#'*20}\n\t\t\tAveraging weights\n{'#'*20}\n\n")
 	# loss_avg = sum(local_losses) / len(local_losses)
 	# acc_avg = sum(local_acc) / len(local_acc)
 	# # acc_avg = sum
 	# train_loss.append(loss_avg)
 	# train_accuracy.append(acc_avg)
-
-	# # if (epoch+1) % print_every == 0:
-	# print(f' \nAvg Training Stats after {fold} Folds:')
-	# print(f'Training Loss : {np.mean(np.array(train_loss))}')
-	# print('Train Accuracy: {:.2f}% \n'.format(100*train_accuracy[-1]))
 
 	# Test inference after completion of training
 	# torch.cuda.empty_cache()
@@ -632,10 +574,8 @@ if __name__ == '__main__':
 
 
 ###############################################################################################################
-
 #PYCM SECTION INFERENCE AFTER TRAINING
 ###############################################################################################################
-
 
 	cm = pycm.ConfusionMatrix(y_t, y_p, digit = 5)
 	# class_label_names = {k:v for k,v in zip (range(0,len(train_set[0].classes)), train_set[0].classes)}
@@ -661,7 +601,6 @@ if __name__ == '__main__':
 
 
 ###############################################################################################################
-
 # END FINAL PYCM SECTION
 ###############################################################################################################
 
@@ -688,7 +627,5 @@ if __name__ == '__main__':
 	GLOBAL_MODEL.load_state_dict(FINAL_WEIGHTS)
 	torch.save(GLOBAL_MODEL.state_dict(),(os.path.join('skewed_results','global_results',f'{global_model._get_name()}_{args.optimizer}_FINAL_WEIGHTS.pth')))
  
-	
-
 	print('\n Total Run Time: {0:0.4f}'.format(time.time()-start_time))
-	print(f"\n\n{'*'*50}\nDONE!\n{'*'*50}\n\n")
+	print(f"\n\n{'*'*50}\nDONE\n{'*'*50}\n\n")
