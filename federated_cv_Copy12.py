@@ -54,23 +54,6 @@ def skin_cancer_iid(dataset, num_users):
 		# all_idxs = list(set(all_idxs) - dict_users[i])
 	return dict_users
 
-# def skin_cancer_iid(dataset, num_users):
-#     """
-#     Sample I.I.D. client data from MNIST dataset
-#     :param dataset:
-#     :param num_users:
-#     :return: dict of image index
-#     """
-#     num_items = int(len(dataset)/num_users)
-#     arr = np.array([])
-#     dict_users = {i: [] for i in range(5)}
-#     all_idxs = [i for i in range(len(dataset))]
-#     for i in range(num_users):
-#         ch = np.random.choice(all_idxs, num_items, replace=False)
-#         dict_users[i].append(ch)
-#         dict_users[i] = np.asarray(ch)
-#         # all_idxs = list(set(all_idxs) - dict_users[i])
-#     return dict_users
 
 def test_inference(model, testloader):
 	
@@ -82,13 +65,12 @@ def test_inference(model, testloader):
 	
 	loss, total, correct = 0.0, 0.0, 0.0
 	# len(probs)
-	# try:
-	#     if torch.cuda.is_available():
-	#         device = torch.device("cuda:0" else "cpu")
-	#     # device = 'mps' 
-	# except:
-	device = 'mps'
-# 	device = 'cpu'
+	if args.danica_comp:
+		device = 'mps'
+	else:
+		device = 'cpu'
+	# device = 'mps'
+	# device = 'cpu'
 
 	criterion = nn.CrossEntropyLoss().to(device)
 	# testloader = DataLoader(test_dataset, batch_size=8,
@@ -143,102 +125,102 @@ def test_inference(model, testloader):
 
 
 
-def get_metrics(y_true, probs):
-	metrics = {'f1':[],
-			   'precision':[],
-			   'recall':[],
-			   'auc':[]}
+# def get_metrics(y_true, probs):
+# 	metrics = {'f1':[],
+# 			   'precision':[],
+# 			   'recall':[],
+# 			   'auc':[]}
 	
 	
-	# for i in range(len(y_true)):
+# 	# for i in range(len(y_true)):
 	
-	f_l = [f1_score(p.cpu().numpy(), t.cpu().numpy(), average='macro') for t,p in zip(y_true,y_pred)]
-	p_l = [precision_score(p.cpu().numpy(), t.cpu().numpy(), average='macro') for t,p in zip(y_true,y_pred)]
-	r_l = [recall_score(p.cpu().numpy(), t.cpu().numpy(), average='macro') for t,p in zip(y_true,y_pred)]
+# 	f_l = [f1_score(p.cpu().numpy(), t.cpu().numpy(), average='macro') for t,p in zip(y_true,y_pred)]
+# 	p_l = [precision_score(p.cpu().numpy(), t.cpu().numpy(), average='macro') for t,p in zip(y_true,y_pred)]
+# 	r_l = [recall_score(p.cpu().numpy(), t.cpu().numpy(), average='macro') for t,p in zip(y_true,y_pred)]
 	
 	
 		
-	metrics['f1'].append(sum(f_l)/len(f_l))
-	# p,r = precision_recall(sum(f_l)/len(f_l))
-	metrics['precision'].append(sum(p_l)/len(p_l))
-	# metrics['recall'].append(r.numpy())
-	metrics['recall'].append(sum(r_l)/len(r_l))
+# 	metrics['f1'].append(sum(f_l)/len(f_l))
+# 	# p,r = precision_recall(sum(f_l)/len(f_l))
+# 	metrics['precision'].append(sum(p_l)/len(p_l))
+# 	# metrics['recall'].append(r.numpy())
+# 	metrics['recall'].append(sum(r_l)/len(r_l))
 	
-	df_m = pd.DataFrame(metrics)
+# 	df_m = pd.DataFrame(metrics)
 	
-	# f1_avg = df_m['f1'].mean()
-	# p_avg = df_m['precision'].mean()
-	# r_avg = df_m['recall'].mean()
-	# auc_avg = df_m['auc'].mean()
+# 	# f1_avg = df_m['f1'].mean()
+# 	# p_avg = df_m['precision'].mean()
+# 	# r_avg = df_m['recall'].mean()
+# 	# auc_avg = df_m['auc'].mean()
 	
-	# print(f1_avg, p_avg, r_avg, auc_avg)
-	return df_m
+# 	# print(f1_avg, p_avg, r_avg, auc_avg)
+# 	return df_m
 
 
-def get_metrics(y_true, probs):
-	# metrics = {'f1':[],
-	#            'precision':[],
-	#            'recall':[],
-	#            'auc':[]}
-	y_true = torch.tensor(y_true).to(device)
+# def get_metrics(y_true, probs):
+# 	# metrics = {'f1':[],
+# 	#            'precision':[],
+# 	#            'recall':[],
+# 	#            'auc':[]}
+# 	y_true = torch.tensor(y_true).to(device)
 	
 	
-	# for i in range(len(y_true)):
+# 	# for i in range(len(y_true)):
 		
-	f1 = f1_score(probs.detach(), y_true)
-	print('f1 in function: ',f1)
-	p,r = precision_recall(probs.detach().to(device), y_true, average='weighted', num_classes=9)
-	print('p,r: ',p,r)
-	# metrics['precision'].append(p.numpy())
-	# metrics['recall'].append(r.numpy())
-	# auc = auroc(probs.detach().to(device), y_true[-1])    
-#     df_m = pd.DataFrame(metrics)
+# 	f1 = f1_score(probs.detach(), y_true)
+# 	print('f1 in function: ',f1)
+# 	p,r = precision_recall(probs.detach().to(device), y_true, average='weighted', num_classes=9)
+# 	print('p,r: ',p,r)
+# 	# metrics['precision'].append(p.numpy())
+# 	# metrics['recall'].append(r.numpy())
+# 	# auc = auroc(probs.detach().to(device), y_true[-1])    
+# #     df_m = pd.DataFrame(metrics)
 	
-#     f1_avg = df_m['f1'].mean()
-#     p_avg = df_m['precision'].mean()
-#     r_avg = df_m['recall'].mean()
-#     auc_avg = df_m['auc'].mean()
+# #     f1_avg = df_m['f1'].mean()
+# #     p_avg = df_m['precision'].mean()
+# #     r_avg = df_m['recall'].mean()
+# #     auc_avg = df_m['auc'].mean()
 	
-	# print(f1_avg, p_avg, r_avg, auc_avg)
-	return f1, p,r
+# 	# print(f1_avg, p_avg, r_avg, auc_avg)
+# 	return f1, p,r
 
 
 
 
 
-def plot_confusion_matrix(cm, class_names):
-	"""
-	Returns a matplotlib figure containing the plotted confusion matrix.
+# def plot_confusion_matrix(cm, class_names):
+# 	"""
+# 	Returns a matplotlib figure containing the plotted confusion matrix.
 	
-	Args:
-	   cm (array, shape = [n, n]): a confusion matrix of integer classes
-	   class_names (array, shape = [n]): String names of the integer classes
-	"""
+# 	Args:
+# 	   cm (array, shape = [n, n]): a confusion matrix of integer classes
+# 	   class_names (array, shape = [n]): String names of the integer classes
+# 	"""
 	
-	figure = plt.figure(figsize=(8, 8))
-	plt.imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
-	plt.title("Confusion matrix")
-	plt.colorbar()
-	tick_marks = np.arange(len(class_names))
-	plt.xticks(tick_marks, class_names, rotation=45,fontsize=8,horizontalalignment='right')
-	plt.yticks(tick_marks, class_names,fontsize=8)
+# 	figure = plt.figure(figsize=(8, 8))
+# 	plt.imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
+# 	plt.title("Confusion matrix")
+# 	plt.colorbar()
+# 	tick_marks = np.arange(len(class_names))
+# 	plt.xticks(tick_marks, class_names, rotation=45,fontsize=8,horizontalalignment='right')
+# 	plt.yticks(tick_marks, class_names,fontsize=8)
 	
-	# Normalize the confusion matrix.
-	cm = np.around(cm.astype('float') / cm.sum(axis=1)[:, np.newaxis], decimals=2)
+# 	# Normalize the confusion matrix.
+# 	cm = np.around(cm.astype('float') / cm.sum(axis=1)[:, np.newaxis], decimals=2)
 	
-	# Use white text if squares are dark; otherwise black.
-	threshold = cm.max() / 2.
+# 	# Use white text if squares are dark; otherwise black.
+# 	threshold = cm.max() / 2.
 
-	for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
-		color = "white" if cm[i, j] < threshold else "black"
-		plt.text(j, i, cm[i, j], horizontalalignment="center", color=color,fontsize=7)
+# 	for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+# 		color = "white" if cm[i, j] < threshold else "black"
+# 		plt.text(j, i, cm[i, j], horizontalalignment="center", color=color,fontsize=7)
 		
-	plt.tight_layout()
-	plt.ylabel('True label')
-	plt.xlabel('Predicted label')
-	return figure
+# 	plt.tight_layout()
+# 	plt.ylabel('True label')
+# 	plt.xlabel('Predicted label')
+# 	return figure
 
-	# return cf_matrix
+# 	# return cf_matrix
 	
 
 
@@ -343,7 +325,8 @@ def sanity_check_datasets(clients, skewed_ds):
 	print(f"skewed_ds {skewed_ds}")
 
 
-   
+#########################################################################################################################
+# Makes directories to save output if they don't exist yet   
 #########################################################################################################################
 if not os.path.exists(os.path.join('skewed_results','global_results')):
 	os.makedirs(os.path.join('skewed_results','global_results'))
@@ -363,6 +346,14 @@ if __name__ == '__main__':
 	args = args_parser()
 	exp_details(args)
 
+	# added this so hopefully we aren't having to switch it constantly
+	# Default set to danica's computer so don't worry about this argument
+	# if I run on mine I'll set it to false, or if you run on another set --danica_comp False on cmd line
+	if args.danica_comp:
+		device = 'mps'
+	else:
+		device = 'cpu'
+
 	# if args.gpu_id:
 	#     torch.cuda.set_device(args.gpu_id)
 	# try:
@@ -370,16 +361,12 @@ if __name__ == '__main__':
 	#     # device = 'mps' if args.gpu else 'cpu'
 	# except:
 	#     device = 'cpu'
-	device = 'mps'
+	# device = 'mps'
 # 	device = 'cpu'
-	# load dataset and user groups
-	# train_dataset, test_dataset, user_groups = get_dataset(args)
-	
-	# train_set =  SkinCancer(os.path.join('../../skin_cancer_data_fed','train'), transform=None)
-	# train_set =  SkinCancer(os.path.join(f'../../{d_?}','train'), transform=None)
-#     ######################################################################################################################################
 
-# ##################################
+######################################################################################################################################
+
+##################################
 # changing the train set to be a list of training sets each from a skewed dataset
 # these will be accessed by indexing in the kfold below
 	train_set, skewed_datasets = build_train_set_lst()
@@ -403,7 +390,7 @@ if __name__ == '__main__':
 
 
 
-	######################################################################################################################################
+######################################################################################################################################
 	
 	# user_groups = skin_cancer_iid(train_set, 5) # was 2
 	user_groups = skin_cancer_skewed(train_set, 2)
@@ -412,11 +399,10 @@ if __name__ == '__main__':
 	# this is showing us which client has which dataset
 	# not easy to tell which is which but we can determine each is accounted for
 	# print(f"\n\nSkewed Dataset Ordering\n\n{[v for v in skewed_datasets.values()]}\n\n\n")
-	######################################################################################################################################
+######################################################################################################################################
 
 #######################################################################
-
-	# sanity_check_datasets(user_groups, skewed_datasets)
+# sanity_check_datasets(user_groups, skewed_datasets)
 #######################################################################
 
 	
@@ -450,21 +436,18 @@ if __name__ == '__main__':
 
 ###################################################################################################################
 ### FREEZING WEIGHTS HERE
-### CHECK WHERE THEY ARE SAVE FOR FINE TUNING NEXT
-###################################################################################################################
-	c = 0
-	for name, param in model.named_parameters():
-		if c < 208: # this is where the layers changed, all new layers should be set to True
-			param.requires_grad = False
-		# print(name, ':', param.requires_grad) # if you want to print and check they are froze uncomment these
-		# print("PARAM # ", c)
-		c += 1
+### disable freezing with --freeze False on cmd line
 ###################################################################################################################
 
-
-
-
-
+	if args.freeze:
+		c = 0
+		for name, param in model.named_parameters():
+			if c < 208: # this is where the layers changed, all new layers should be set to True
+				param.requires_grad = False
+			# print(name, ':', param.requires_grad) # if you want to print and check they are froze uncomment these
+			# print("PARAM # ", c)
+			c += 1
+###################################################################################################################
 
 
 
@@ -481,22 +464,16 @@ if __name__ == '__main__':
 	# GLOBAL_MODEL.classifier[1].out_features = 9
 	# print(GLOBAL_MODEL.classifier)
 	
-	
-
 	# Set the model to train and send it to device.
 	GLOBAL_MODEL.to(device)
 	GLOBAL_MODEL.train()
 	# print(global_model)
 	
-	
-
 	# copy weights
 	GLOBAL_MODEL_WEIGHTS = copy.deepcopy(GLOBAL_MODEL.state_dict())
 	
-	
 	# global_weights = global_model.state_dict()
 
-	# Training
 	train_loss, train_accuracy = [], []
 	
 	test_loss, test_accuracy = [], []
@@ -510,57 +487,38 @@ if __name__ == '__main__':
 			   'test_loss': [], 'test_acc': []}
 	
 	history_c={'client_acc':[], 'client_loss':[]}
-		
-		
+				
 	global_model = GLOBAL_MODEL
 
-###############################################################################################################################    
-	# k=2
-	# k = 5
-	# splits = KFold(n_splits = k, shuffle = True, random_state = 42)
-	
 	best_acc = 0.0
 	AVG_WEIGHTS=[]
-	
-
-
-######################MOVIGN THIS TO A LOWER PORTION
-	# for fold in range(k):##############################################################
-
-		# This is new idea
-		# now the kfold is just running through a range 0-k and using that as the fold #
-		# the data is not being split here because it won't work with current setup
-		# after a user_idx is selected below, data is split using a 4/5 1/5 split for train, val
-		# currently missing function for this but will create
-
 
 	local_weights=[]
 	user_sets=[]
 		
 	global_model.load_state_dict(GLOBAL_MODEL_WEIGHTS)
 		
-	# print(f'Model Initialized for fold {fold}...') # moved down into for loop just below
 
-	k = 2 # K folds
-# ######################################################
-# ####    BEGIN KFOLD         
-	for fold in range(k):
-		print(f'Model Initialized for fold {fold}...')
+######################################################
+# logic
+# for each global epoch
+# 	for each client perform kfold cross validation
+# at end of global epoch avg weights
+# repeat until all global epochs complete
+######################################################
+
 		
-# ######################################################
-		
-		
-		for epoch in tqdm(range(int(args.epochs))): # GLOBAL EPOCHS CURRENTLY AT 3
-			# print(f'Model Initialized for fold {epoch}...')
-			local_weights, local_losses, local_acc = [], [], []
-			print(f'\n | Global Training Round : {epoch+1} |\n')
+	for epoch in tqdm(range(int(args.epochs))): # GLOBAL EPOCHS CURRENTLY AT 3
+		# print(f'Model Initialized for fold {epoch}...')
+		local_weights, local_losses, local_acc = [], [], []
+		print(f'\n | Global Training Round : {epoch+1} of {args.epochs}|\n')
 
 
 
-			global_model.train()
-			m = max(int(args.frac * args.num_users), 1)
-			# pick a random client from the range of clients
-			idxs_users = np.random.choice(range(args.num_users), m, replace=False)
+		global_model.train()
+		m = max(int(args.frac * args.num_users), 1)
+		# pick a random client from the range of clients
+		idxs_users = np.random.choice(range(args.num_users), m, replace=False)
 
 			
 		# going thru each user in the list without replacement
@@ -583,10 +541,20 @@ if __name__ == '__main__':
 #             print(f'Model Initialized for fold {epoch}...')
 		
 # ######################################################
-			# for idx in idxs_users:
-			for idx in range(args.num_users):
+		# for idx in idxs_users:
+		for idx in range(args.num_users):
 
-			# print(f'User Index__________{idx} __________')
+		# print(f'User Index__________{idx} __________')
+
+
+			k = 2 # K folds SET TO 5 FOR ACTUAL RUNS
+		######################################################
+		####    BEGIN KFOLD         
+			for fold in range(k):
+				print(f'Model Initialized for fold {fold}...')
+
+
+
 
 				client_data = user_groups[idx][:] # trying to copy all indexes from dataset for given client
 				print(f'\nuser_groups__{idx}\t\t',type(user_groups[idx]),'\n\n')
@@ -670,51 +638,6 @@ if __name__ == '__main__':
 				# accuracy, loss, y_true, y_pred
 				# torch.cuda.empty_cache()
 				client_acc, client_loss, y_true, y_pred, y_t, y_p = test_inference(global_model, test_loader)
-				
-
-
-
-###############################################################################################################
-
-#PYCM SECTION
-###############################################################################################################
-
-				
-				cm = pycm.ConfusionMatrix(y_t, y_p, digit = 5)
-				# class_label_names = {k:v for k,v in zip (range(0,len(train_set[0].classes)), train_set[0].classes)}
-				# cm.relabel(mapping = class_label_names)
-				cm.stat(summary = True)
-				to_save_as_a_file = cm.to_array()
-				# with open(f'fold_{int(fold)}_client_{idx}_confusion_matris.csv', 'w') as write_file:
-					# write_file.write(to_save_as_a_file)
-				# hpc
-				cm.save_csv(os.path.join('skewed_results','local_results',f"fold_{int(fold)}_client_{idx}_summary"))
-				# my laptop
-				# cm.save_csv(os.path.join("..","results","federated_skewed","local", f"fold_{int(fold)}_client_{idx}_summary"), summary = True, matrix_save = False)
-
-				confusion_matrix_df = pd.DataFrame(cm.table)
-				confusion_matrix_df.to_csv(f'fold_{int(fold)}_client_{idx}_confusion_matrix.csv')
-				truth_vs_preds_df = pd.DataFrame({'y_true': y_t, 'y_pred': y_p})
-				# hpc
-				truth_vs_preds_df.to_csv(os.path.join('skewed_results','local_results',f'fold_{int(fold)}_client_{idx}_truth_v_preds.csv'))
-				# my laptop
-				# truth_vs_preds_df.to_csv(os.path.join("..","results","federated_skewed","local", f'fold_{int(fold)}_client_{idx}_truth_v_preds.csv'))
-
-				# cm.plot(cmap = plt.cm.Greens,
-					# number_label = True, 
-					# plot_lib = "matplotlib")
-				# hpc
-				# plt.savefig(os.path.join('skewed_results','local_results', f"fold_{int(fold)}_client_{idx}_cmplot_output.png"), facecolor = 'y', bbox_inches = "tight",pad_inches = 0.3, transparent = True)      
-				# laptop
-				# plt.savefig(os.path.join("..","results","federated_skewed","local", f"fold_{int(fold)}_client_{idx}_cmplot_output.png"), facecolor = 'y', bbox_inches = "tight",pad_inches = 0.3, transparent = True)
-
-				
-
-###############################################################################################################
-
-# END PYCM SECTION
-###############################################################################################################
-
 
 				
 				# print(f'| Y_True {y_true} | Y_Pred {y_pred} | Y_Preds: {y_preds}')
@@ -724,79 +647,33 @@ if __name__ == '__main__':
 
 
 			# update global weights
-			global_weights = average_weights(local_weights)
+	global_weights = average_weights(local_weights)
 
-			# update global weights
-			global_model.load_state_dict(global_weights)
-			# torch.cuda.empty_cache()
+	# update global weights
+	global_model.load_state_dict(global_weights)
+	# torch.cuda.empty_cache()
 			
-			if epoch != 0: # was == 1
+	if epoch != 0: # was == 1
 			
-				# torch.save(global_model.state_dict(), f'../save_new/fed_models/{global_model._get_name()}_E{epoch}_F{fold}.pth')
-				AVG_WEIGHTS.append(global_model.state_dict())
+		# torch.save(global_model.state_dict(), f'../save_new/fed_models/{global_model._get_name()}_E{epoch}_F{fold}.pth')
+		AVG_WEIGHTS.append(global_model.state_dict())
 
-			loss_avg = sum(local_losses) / len(local_losses)
-			acc_avg = sum(local_acc) / len(local_acc)
-			# acc_avg = sum
-			train_loss.append(loss_avg)
-			train_accuracy.append(acc_avg)
+	loss_avg = sum(local_losses) / len(local_losses)
+	acc_avg = sum(local_acc) / len(local_acc)
+	# acc_avg = sum
+	train_loss.append(loss_avg)
+	train_accuracy.append(acc_avg)
 
-			# if (epoch+1) % print_every == 0:
-			print(f' \nAvg Training Stats after {fold} Folds:')
-			print(f'Training Loss : {np.mean(np.array(train_loss))}')
-			print('Train Accuracy: {:.2f}% \n'.format(100*train_accuracy[-1]))
-
-
+	# if (epoch+1) % print_every == 0:
+	print(f' \nAvg Training Stats after {fold} Folds:')
+	print(f'Training Loss : {np.mean(np.array(train_loss))}')
+	print('Train Accuracy: {:.2f}% \n'.format(100*train_accuracy[-1]))
 
 
-
-
-
-
-		# Test inference after completion of training
-		# torch.cuda.empty_cache()
-		test_acc, test_loss, y_true, y_pred, y_t, y_p = test_inference(global_model, test_loader)
+	# Test inference after completion of training
+	# torch.cuda.empty_cache()
+	test_acc, test_loss, y_true, y_pred, y_t, y_p = test_inference(global_model, test_loader)
 		
-		f_l = [f1_score(p.cpu().numpy(), t.cpu().numpy(), average='macro') for t,p in zip(y_true,y_pred)]
-		p_l = [precision_score(p.cpu().numpy(), t.cpu().numpy(), average='macro') for t,p in zip(y_true,y_pred)]
-		r_l = [recall_score(p.cpu().numpy(), t.cpu().numpy(), average='macro') for t,p in zip(y_true,y_pred)]
-		# auc_l = [roc_auc_score(p.cpu().numpy(), t.cpu().numpy(), multi_class='ovr') for t,p in zip(y_true,y_pred)]
-
-		f1_avg = sum(f_l)/len(f_l)
-		# print('f1:', f1_s)
-		p_avg = sum(p_l)/len(p_l)
-		r_avg = sum(r_l)/len(r_l)
-		
-		# if not os.path.exists('../save_new/cf_matrix_final2'):
-		#     os.mkdir('../save_new/cf_matrix_final2')
-		# save_fig = f'../save_new/cf_matrix_final2/{global_model._get_name()}_fold_{fold}.png'
-		# cf_fold = plot_confusion_matrix(cf_matrix, class_names=class_names)
-		# cf_fold.savefig(save_fig)
-				
-		
-		# with open('../save_new/metrics_per_fold.txt','a+') as f:
-		#             f.write(f'Fold: {str(fold)}\tF1-Score: {round(f1_avg, 2)}\tPrecision: {str(round(p_avg,2))}\tRecall: {str(round(r_avg,2))}\tAccuracy: {str(round(test_acc,2))}\tLoss: {str(round(test_loss,2))}\n')
-					
-					
-		# y_t = torch.tensor(y_true).to(device)
-		# f1 = f1_score(probs.detach(), y_t)
-		# print('f1 in function: ',f1)
-		# p,r = precision_recall(probs.detach().to(device), y_t, average='weighted', num_classes=9)
-		# print('p,r: ',p,r)
-		
-		# fold_cf_matrix = confusion_matrix(y_true, y_pred)
-
-		# cf_fold=plot_confusion_matrix(fold_cf_matrix, class_names)
-		
-		# f1_avg, p_avg, r_avg = get_metrics(y_true, probs)
-#         print('='*25, 'Metrics','='*25)
-#         print(f'| F1-Score: {f1_avg} | Precision: {p_avg} | Recall: {r_avg} | AUC: {auc_avg} |')
-#         print('='*100)
-				
-		# save_fig = f'../save_new/fed_cm/{global_model._get_name()}_fold_{fold}.png'
-		# cf_fold.savefig(save_fig)
-		# np.save(f'../save_new/fed_cm/{global_model._get_name()}_fold_{fold}.npy', fold_cf_matrix)
-
 
 
 ###############################################################################################################
@@ -805,46 +682,27 @@ if __name__ == '__main__':
 ###############################################################################################################
 
 
-		cm = pycm.ConfusionMatrix(y_t, y_p, digit = 5)
-		# class_label_names = {k:v for k,v in zip (range(0,len(train_set[0].classes)), train_set[0].classes)}
-		# cm.relabel(mapping = class_label_names)
-		cm.stat(summary = True)
-		to_save_as_a_file = cm.to_array()
+	cm = pycm.ConfusionMatrix(y_t, y_p, digit = 5)
+	# class_label_names = {k:v for k,v in zip (range(0,len(train_set[0].classes)), train_set[0].classes)}
+	# cm.relabel(mapping = class_label_names)
+	cm.stat(summary = True)
+	to_save_as_a_file = cm.to_array()
 
-		cm.save_csv(os.path.join('skewed_results','global_results',f"fold_{int(fold)}_client_{idx}_stats_summary"))
-		# with open(f'fold_{int(fold)}_client_{idx}_confusion_matris.csv', 'w') as write_file:
-			# write_file.write(to_save_as_a_file)
-		# hpc
-		# truth_vs_preds_df.to_csv(os.path.join('skewed_results','global_results',f"fold_{int(fold)}_client_{idx}_summary_global"))
-		# my laptop
-		# cm.save_csv(os.path.join("..","results","federated_skewed","global", f"fold_{int(fold)}_client_{idx}_summary_global"), summary = True, matrix_save = False)
+	cm.save_csv(os.path.join('skewed_results','global_results',f"fold_{int(fold)}_client_{idx}_stats_summary"))
 
-		# confusion_matrix_df = pd.DataFrame(cm.table)
-		# hpc
-		# truth_vs_preds_df.to_csv(os.path.join('skewed_results','global_results',f'fold_{int(fold)}_client_{idx}_confusion_matrix_global.csv'))
-		# my laptop
-		# confusion_matrix_df.to_csv(os.path.join("..","results","federated_skewed","global", f'fold_{int(fold)}_client_{idx}_confusion_matrix_global.csv'))
-		truth_vs_preds_df = pd.DataFrame({'y_true': y_t, 'y_pred': y_p})
-		# hpc
-		truth_vs_preds_df.to_csv(os.path.join('skewed_results','global_results',f'fold_{int(fold)}_client_{idx}_truth_v_preds_global.csv'))
-		# my laptop
-		# truth_vs_preds_df.to_csv(os.path.join("..","results","federated_skewed","global", f'fold_{int(fold)}_client_{idx}_truth_v_preds_global.csv'))
+	# confusion_matrix_df = pd.DataFrame(cm.table)
+	truth_vs_preds_df = pd.DataFrame({'y_true': y_t, 'y_pred': y_p})
+	truth_vs_preds_df.to_csv(os.path.join('skewed_results','global_results', f'fold_{int(fold)}_client_{idx}_truth_v_preds_global.csv'))
 
-		# cm.plot(cmap = plt.cm.Greens,
-			# number_label = True, 
-			# plot_lib = "matplotlib")
-		# hpc
-		# plt.savefig(os.path.join('skewed_results','global_results', f"fold_{int(fold)}_client_{idx}_cmplot_output.png"), 
-		#     facecolor = 'y', 
-		#     bbox_inches = "tight",
-		#     pad_inches = 0.3, 
-		#     transparent = True)
-		# laptop
-		# plt.savefig(os.path.join("..","results","federated_skewed","global", f"fold_{int(fold)}_client_{idx}_cmplot_output.png"), 
-			# facecolor = 'y', 
-			# bbox_inches = "tight",
-			# pad_inches = 0.3, 
-			# transparent = True)
+	# cm.plot(cmap = plt.cm.Greens,
+		# number_label = True, 
+		# plot_lib = "matplotlib")
+
+	# plt.savefig(os.path.join("..","results","federated_skewed","global", f"fold_{int(fold)}_client_{idx}_cmplot_output.png"), 
+		# facecolor = 'y', 
+		# bbox_inches = "tight",
+		# pad_inches = 0.3, 
+		# transparent = True)
 
 
 ###############################################################################################################
@@ -855,22 +713,16 @@ if __name__ == '__main__':
 
 
 # ======================= Save Model ======================= #
-		if test_acc > best_acc:
-			best_acc = test_acc
-			# best_model_wts = copy.deepcopy(global_model.state_dict())
-			# torch.save(global_model.state_dict(), f'../save_new/fed_models/{global_model._get_name()}_{args.optimizer}.pth')
+	if test_acc > best_acc:
+		best_acc = test_acc
+		# best_model_wts = copy.deepcopy(global_model.state_dict())
+		# torch.save(global_model.state_dict(), f'../save_new/fed_models/{global_model._get_name()}_{args.optimizer}.pth')
 
 
-		history['test_acc'].append(test_acc)
-		history['test_loss'].append(test_loss)
-		history['train_acc'].append(train_accuracy)
-		history['train_loss'].append(train_loss)
-
-
-		# print(f' \n Results after {fold} Folds of training:')
-		# print("|---- Avg Train Accuracy: {:.2f}%".format(100*train_accuracy[-1]))
-		# print("|---- Test Accuracy: {:.2f}%".format(100*test_acc))
-
+	history['test_acc'].append(test_acc)
+	history['test_loss'].append(test_loss)
+	history['train_acc'].append(train_accuracy)
+	history['train_loss'].append(train_loss)
 
 	df = pd.DataFrame(history)
 	
@@ -880,15 +732,9 @@ if __name__ == '__main__':
 	
 	FINAL_WEIGHTS = average_weights(AVG_WEIGHTS)
 	GLOBAL_MODEL.load_state_dict(FINAL_WEIGHTS)
-	# my laptop
-	# torch.save(GLOBAL_MODEL.state_dict(),(os.path.join('..','results','federated_skewed',f'{global_model._get_name()}_{args.optimizer}_FINAL_WEIGHTS.pth'))
-	# hpc
-	# if not os.path.exists(os.path.join(os.getcwd(), 'skewed_results','global_results')):
-	#     os.mkdir(os.path.join(os.getcwd(), 'skewed_results','global_results'))
-	torch.save(GLOBAL_MODEL.state_dict(),(os.path.join('skewed_results','global_results',f'{global_model._get_name()}_{args.optimizer}_FINAL_WEIGHTS.pth')))
-	# kaggle
-	# torch.save(GLOBAL_MODEL.state_dict(),(os.path.join(f'{global_model._get_name()}_{args.optimizer}_FINAL_WEIGHTS.pth'))
-	 
+	torch.save(GLOBAL_MODEL.state_dict(),(os.path.join('skewed_results','global_results',f'{global_model._get_name()}_{args.optimizer}_FINAL_WEIGHTS.pth'))
+ 
 	
 
 	print('\n Total Run Time: {0:0.4f}'.format(time.time()-start_time))
+	print(f"\n\n{'*'*50}\nDONE!\n{'*'*50}\n\n")
