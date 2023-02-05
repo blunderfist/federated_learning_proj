@@ -70,7 +70,7 @@ def test_inference(model, testloader):
 	else:
 		device = 'cpu'
 	# device = 'mps'
-	# device = 'cpu'
+	device = 'cpu'
 
 	criterion = nn.CrossEntropyLoss().to(device)
 	# testloader = DataLoader(test_dataset, batch_size=8,
@@ -226,30 +226,22 @@ def test_inference(model, testloader):
 
 
 
-	######################################################################################################################################
+######################################################################################################################################
+# Getting data for runs
+######################################################################################################################################
 
 def build_train_set_lst():
 	"""builds list of all skewed datasets"""
-	# skewed_datasets = ['d_1','d_2','d_3','d_4','d_5']
+
 	skewed_datasets = [f'client_{x}' for x in range(1, 6)]
 	train_set_lst = []
 	for i in range(len(skewed_datasets)):
-		# use this first one on DANICA's computer
-		# tmp_train_set =  SkinCancer(os.path.join(f'../../{skewed_datasets[i]}','train'), transform = None)
-		# work comp
-		# tmp_train_set =  SkinCancer(os.path.join(f'{skewed_datasets[i]}','train'), transform = None)
-		# my laptop
-		# tmp_train_set =  SkinCancer(os.path.join('..',f'{skewed_datasets[i]}','train'), transform = None)
-		# hpc
 		tmp_train_set =  SkinCancer(os.path.join('..','skewed_dataset',f'{skewed_datasets[i]}','train'), transform = None)
 		train_set_lst.append(tmp_train_set)
-	# print("train_set_lst",train_set_lst)
-	# skewed_lst = {k:v for k,v in zip(train_set_lst, range(len(skewed_datasets)))} # works but modifying below
-	# skewed_lst = {k:v for k,v in zip(skewed_datasets, train_set_lst)}
+
 	skewed_lst = {k:v for k,v in zip(range(len(skewed_datasets)), train_set_lst)}
 	# print("skewed_lst",skewed_lst) # this will tell us what dataset is from which folder for sanity check
 	return train_set_lst, skewed_lst
-##################################
 
 
 def skin_cancer_skewed(dataset, num_users):
@@ -279,13 +271,8 @@ def skin_cancer_skewed(dataset, num_users):
 
 def get_train_set(client_idx):
 	"""gets skincancer object for each client with path to their dataset"""
-	# skewed_datasets = ['d_1','d_2','d_3','d_4','d_5']
+
 	skewed_datasets = [f'client_{x}' for x in range(1, 6)]
-	# danicas comp
-	# train_set = SkinCancer(os.path.join(f'../../{skewed_datasets[client_idx]}','train'), transform = None)
-	# my comp
-	# train_set = SkinCancer(os.path.join('..',f'{skewed_datasets[client_idx]}','train'), transform = None)
-	# hpc
 	train_set = SkinCancer(os.path.join('..','skewed_dataset',f'{skewed_datasets[client_idx]}','train'), transform = None)
 
 	return train_set
@@ -320,9 +307,9 @@ def splice(lst, start_test, stop_test):
 def sanity_check_datasets(clients, skewed_ds):
 	"""maps clients to dataset folders for santity checking all datasets are being used"""
 
-	# print(f"clients {clients}") # prints entire client folder indexes
-	# print(f"clients {clients.keys()}") # prints just the keys
-	# print(f"skewed_ds {skewed_ds}")
+	print(f"clients:\t\t{clients}") # prints entire client folder indexes
+	print(f"clients keys:\t\t{clients.keys()}") # prints just the keys
+	print(f"skewed_ds:\t\t{skewed_ds}")
 
 
 #########################################################################################################################
@@ -335,6 +322,9 @@ if not os.path.exists(os.path.join('skewed_results','local_results')):
 #########################################################################################################################
 
 
+######################################################################################################################################
+# Begin federated learning
+######################################################################################################################################
 
 if __name__ == '__main__':
 	start_time = time.time()
@@ -366,8 +356,6 @@ if __name__ == '__main__':
 # 	device = 'cpu'
 
 ######################################################################################################################################
-
-##################################
 # changing the train set to be a list of training sets each from a skewed dataset
 # these will be accessed by indexing in the kfold below
 	train_set, skewed_datasets = build_train_set_lst()
@@ -376,7 +364,6 @@ if __name__ == '__main__':
 	# for i in range(len(train_set)):
 	#     print(train_set[i])
 	#     print("len traingset",len(train_set),"\n\n\n\n\n\n\n\n\n")
-##################################
 	# tmp = train_set[0]
 	# print("TRAIN SET",tmp.classes)
 
@@ -388,9 +375,8 @@ if __name__ == '__main__':
 	# test_set = SkinCancer(os.path.join('../../skin_cancer_data_fed','test'), transform=None)
 
 
-
-
-
+######################################################################################################################################
+# Client's get their data assigned
 ######################################################################################################################################
 	
 	# user_groups = skin_cancer_iid(train_set, 5) # was 2
@@ -406,14 +392,7 @@ if __name__ == '__main__':
 # sanity_check_datasets(user_groups, skewed_datasets)
 #######################################################################
 
-	
-	# this was the hardcoded model from before
-	# GLOBAL_MODEL = torchvision.models.efficientnet_b0(pretrained=True)
-	# GLOBAL_MODEL = custom_EN_b0_v2(pretrained=True)
-	# GLOBAL_MODEL = args.model
 
-	# need this section to pull models from models.py
-	# this was previously hardcoded to efficientnet 
 	if args.model == 'efficientnet':
 		
 		model = models.efficientnet_b0(pretrained=True)
@@ -437,6 +416,7 @@ if __name__ == '__main__':
 
 ###################################################################################################################
 ### FREEZING WEIGHTS HERE
+### defaults to True
 ### disable freezing with --freeze False on cmd line
 ###################################################################################################################
 
@@ -459,9 +439,9 @@ if __name__ == '__main__':
 	custom = ['custom_EN_b0_v2', 'custom_EN_b0_v3']
 	if args.model not in custom:
 		old_fc = GLOBAL_MODEL.classifier.__getitem__(-1)
-		new_fc = nn.Linear(in_features=old_fc.in_features, out_features= 9, bias=True)
+		new_fc = nn.Linear(in_features = old_fc.in_features, out_features = 9, bias = True)
 		GLOBAL_MODEL.classifier.__setitem__(-1 , new_fc)
-	print(type(GLOBAL_MODEL))
+	# print(type(GLOBAL_MODEL))
 	# GLOBAL_MODEL.classifier[1].out_features = 9
 	# print(GLOBAL_MODEL.classifier)
 	
@@ -508,54 +488,33 @@ if __name__ == '__main__':
 # repeat until all global epochs complete
 ######################################################
 
-		
-	for epoch in tqdm(range(int(args.epochs))): # GLOBAL EPOCHS CURRENTLY AT 3
+	# START GLOBAL EPOCHS
+	for epoch in tqdm(range(int(args.epochs))):
 		# print(f'Model Initialized for fold {epoch}...')
 		local_weights, local_losses, local_acc = [], [], []
 		print(f'\n | Global Training Round : {epoch+1} of {args.epochs}|\n')
 
-
-
 		global_model.train()
+		# honestly can't remember what this does, Danica can explain
 		m = max(int(args.frac * args.num_users), 1)
+
 		# pick a random client from the range of clients
 		idxs_users = np.random.choice(range(args.num_users), m, replace=False)
 
-			
-		# going thru each user in the list without replacement
-#         for idx in idxs_users:
-#             # print(f'User Index__________{idx} __________')
-				
-
-#             # a user has been chosen (idx)
-#             # this idx is being used to select the index of the dataset in the list of skewed datasets we created
-#             # then we split the dataset we selected
-
-#             # print(f"TRAIN SET IDX\n\n\n\n\n\n{user_groups[idx]}\n\n\n\n\n\n\n")
-#             client_data = user_groups[idx][:] # trying to copy all indexes from dataset for given client
-#             # print("user_groups[idx]\n\n\n\n\n",type(user_groups[idx]),'\n\n\n\n\n\n\n')
-#             np.random.shuffle(client_data)
-			
-# ######################################################
-# ####    BEGIN KFOLD         
-#         for fold in range(k):
-#             print(f'Model Initialized for fold {epoch}...')
-		
-# ######################################################
-		# for idx in idxs_users:
+		##################################################################
+		# iterating through each client to perform kfold cv for this epoch
 		for idx in range(args.num_users):
 
 			print(f'Client Index__________{idx+1} __________')
 
 
-			k = 2 # K folds SET TO 5 FOR ACTUAL RUNS
 		######################################################
-		####    BEGIN KFOLD         
+		####    BEGIN KFOLD FOR THIS CLIENT
+		######################################################
+
+			k = 5 # set K folds
 			for fold in range(k):
 				print(f'Model Initialized for fold {fold+1} of {k}')
-
-
-
 
 				client_data = user_groups[idx][:] # trying to copy all indexes from dataset for given client
 				# print(f'\nclient_#__{idx}\t\t',type(user_groups[idx]),'\n\n')
@@ -575,7 +534,7 @@ if __name__ == '__main__':
 #                 print(f"DATA type: {type(client_data)}")
 #                 # print(f"DATA train_idx: {train_idx}")
 #                 # print(f"DATA val_idx: {val_idx}")
-				print(f"\n\nDATA LEN: {len(client_data)}\n\n")
+				# print(f"\n\nDATA LEN: {len(client_data)}\n\n") # can help distinguish between dif selections of data, should be dif for all clients
 #                 print(f"FOLD SIZE: {fold_size}")
 #                 print(f"start_test: {start_test}")
 #                 print(f"stop_test: {stop_test}")
@@ -586,19 +545,13 @@ if __name__ == '__main__':
 #                 print(f"TRAIN_IDX\n\n\n\n\n\n{train_idx}\n\n\n\n\n\n\n")
 
 
-
-# ######################################################################################################################
-# UNCOMMENT FOR RUNS
-# 				train_set = get_train_set(idx)
-# 				train_sampler = SubsetRandomSampler(train_idx)
-# 				test_sampler = SubsetRandomSampler(val_idx)
-
-# ######################################################################################################################
+				train_set = get_train_set(idx)
+				train_sampler = SubsetRandomSampler(train_idx)
+				test_sampler = SubsetRandomSampler(val_idx)
 # 				# added [data_index] here too
-# 				train_dataset = torch.utils.data.Subset(train_set, train_sampler.indices)
-# 				test_set = torch.utils.data.Subset(train_set, test_sampler.indices)
-# 				test_loader = DataLoader(test_set, batch_size=16,shuffle=False)
-# ######################################################################################################################
+				train_dataset = torch.utils.data.Subset(train_set, train_sampler.indices)
+				test_set = torch.utils.data.Subset(train_set, test_sampler.indices)
+				test_loader = DataLoader(test_set, batch_size=16,shuffle=False)
 
 				
 
@@ -611,48 +564,34 @@ if __name__ == '__main__':
 				# dataloader = DataLoader(train_dataset, batch_size=16, sampler=train_sampler)
 
 
-# ######################################################################################################################
-# UNCOMMENT FOR RUNS
-				# dataloader = DataLoader(train_set, batch_size=16, sampler=train_sampler)
-				# print(f'Client Index__________{idx} __________')
+				dataloader = DataLoader(train_set, batch_size=16, sampler=train_sampler)
+				print(f'Client Index__________{idx} __________')
 				if epoch == 0:
-					print("epoch ==0: epoch is", epoch)
-# ######################################################################################################################
-# UNCOMMENT FOR RUNS
-					# global_model.load_state_dict(GLOBAL_MODEL_WEIGHTS)
-					# local_model = LocalUpdate(args=args, dataset=train_dataset,
-					# 					  idxs=client_data, weights = GLOBAL_MODEL_WEIGHTS,
-					# 					  model = global_model, logger=None)                    
-
+					# print("epoch ==0: epoch is", epoch)
+					global_model.load_state_dict(GLOBAL_MODEL_WEIGHTS)
+					local_model = LocalUpdate(args=args, dataset=train_dataset,
+										  idxs=client_data, weights = GLOBAL_MODEL_WEIGHTS,
+										  model = global_model, logger=None)                    
 				
 				else:
-					print("epoch > 0: epoch is", epoch)
+					# print("epoch > 0: epoch is", epoch)
 
-# ######################################################################################################################
-# UNCOMMENT FOR RUNS
-					# global_model.load_state_dict(global_weights)
-					# local_model = LocalUpdate(args=args, dataset=train_dataset,
-					# 					  idxs=client_data , weights = GLOBAL_MODEL_WEIGHTS,
-					# 					  model = global_model, logger=None)
+					global_model.load_state_dict(global_weights)
+					local_model = LocalUpdate(args=args, dataset=train_dataset,
+										  idxs=client_data , weights = GLOBAL_MODEL_WEIGHTS,
+										  model = global_model, logger=None)
 
+				w, loss , acc = local_model.update_weights(dataloader=dataloader, global_round=epoch)
 					
-				# w, loss , acc = local_model.update_weights(dataloader=dataloader, global_round=fold)
-				# print("EPOCH",epoch)
-				# print("TYPE EPOCH",type(epoch))
+				local_weights.append(copy.deepcopy(w))
+				local_losses.append(copy.deepcopy(loss))
+				local_acc.append(copy.deepcopy(acc))
+				global_model.load_state_dict(w)
 
-# ######################################################################################################################
-# UNCOMMENT FOR RUNS				
-				# w, loss , acc = local_model.update_weights(dataloader=dataloader, global_round=epoch)
-					
-				# local_weights.append(copy.deepcopy(w))
-				# local_losses.append(copy.deepcopy(loss))
-				# local_acc.append(copy.deepcopy(acc))
-				# global_model.load_state_dict(w)
-
-				# # print(f'Testing for Client {idx}')
-				# # accuracy, loss, y_true, y_pred
-				# # torch.cuda.empty_cache()
-				# client_acc, client_loss, y_true, y_pred, y_t, y_p = test_inference(global_model, test_loader)
+				# print(f'Testing for Client {idx}')
+				# accuracy, loss, y_true, y_pred
+				# torch.cuda.empty_cache()
+				client_acc, client_loss, y_true, y_pred, y_t, y_p = test_inference(global_model, test_loader)
 
 				
 				# # print(f'| Y_True {y_true} | Y_Pred {y_pred} | Y_Preds: {y_preds}')
@@ -661,23 +600,20 @@ if __name__ == '__main__':
 				# history_c['client_loss'].append(client_loss)
 
 
-			# update global weights
-# ######################################################################################################################
-# UNCOMMENT FOR RUNS
-	# global_weights = average_weights(local_weights)
+		# avg all client weights
+		global_weights = average_weights(local_weights)
 
-	# # update global weights
-	# global_model.load_state_dict(global_weights)
-	# # torch.cuda.empty_cache()
+		# update global weights loading into model
+		global_model.load_state_dict(global_weights)
+		# torch.cuda.empty_cache()
 			
-		if epoch != 0: # was == 1
-			print("avg weights!!!: epoch is", epoch)
-
-# ######################################################################################################################
-# UNCOMMENT FOR RUNS
-	# 	# torch.save(global_model.state_dict(), f'../save_new/fed_models/{global_model._get_name()}_E{epoch}_F{fold}.pth')
-		# AVG_WEIGHTS.append(global_model.state_dict())
-		print("Averaging the weights!")
+		# if epoch != 0: # was == 1
+			# print("avg weights!!!: epoch is", epoch)
+		if not os.path.exists(os.path.join('fed_models')):
+			os.mkdir('fed_models')
+		torch.save(global_model.state_dict(), os.path.join(f'fed_models',f'{global_model._get_name()}_E{epoch}_F{fold}.pth'))
+		AVG_WEIGHTS.append(global_model.state_dict())
+		# print("Averaging the weights!")
 	# loss_avg = sum(local_losses) / len(local_losses)
 	# acc_avg = sum(local_acc) / len(local_acc)
 	# # acc_avg = sum
@@ -685,15 +621,13 @@ if __name__ == '__main__':
 	# train_accuracy.append(acc_avg)
 
 	# # if (epoch+1) % print_every == 0:
-	print(f' \nAvg Training Stats after {fold} Folds:')
+	# print(f' \nAvg Training Stats after {fold} Folds:')
 	# print(f'Training Loss : {np.mean(np.array(train_loss))}')
 	# print('Train Accuracy: {:.2f}% \n'.format(100*train_accuracy[-1]))
 
-# ######################################################################################################################
-# UNCOMMENT FOR RUNS
-	# # Test inference after completion of training
-	# # torch.cuda.empty_cache()
-	# test_acc, test_loss, y_true, y_pred, y_t, y_p = test_inference(global_model, test_loader)
+	# Test inference after completion of training
+	# torch.cuda.empty_cache()
+	test_acc, test_loss, y_true, y_pred, y_t, y_p = test_inference(global_model, test_loader)
 		
 
 
@@ -703,27 +637,27 @@ if __name__ == '__main__':
 ###############################################################################################################
 
 
-	# cm = pycm.ConfusionMatrix(y_t, y_p, digit = 5)
-	# # class_label_names = {k:v for k,v in zip (range(0,len(train_set[0].classes)), train_set[0].classes)}
-	# # cm.relabel(mapping = class_label_names)
-	# cm.stat(summary = True)
-	# to_save_as_a_file = cm.to_array()
+	cm = pycm.ConfusionMatrix(y_t, y_p, digit = 5)
+	# class_label_names = {k:v for k,v in zip (range(0,len(train_set[0].classes)), train_set[0].classes)}
+	# cm.relabel(mapping = class_label_names)
+	cm.stat(summary = True)
+	to_save_as_a_file = cm.to_array()
 
-	# cm.save_csv(os.path.join('skewed_results','global_results',f"fold_{int(fold)}_client_{idx}_stats_summary"))
+	cm.save_csv(os.path.join('skewed_results','global_results',f"fold_{int(fold)}_client_{idx}_stats_summary"))
 
-	# # confusion_matrix_df = pd.DataFrame(cm.table)
-	# truth_vs_preds_df = pd.DataFrame({'y_true': y_t, 'y_pred': y_p})
-	# truth_vs_preds_df.to_csv(os.path.join('skewed_results','global_results', f'fold_{int(fold)}_client_{idx}_truth_v_preds_global.csv'))
+	# confusion_matrix_df = pd.DataFrame(cm.table)
+	truth_vs_preds_df = pd.DataFrame({'y_true': y_t, 'y_pred': y_p})
+	truth_vs_preds_df.to_csv(os.path.join('skewed_results','global_results', f'fold_{int(fold)}_client_{idx}_truth_v_preds_global.csv'))
 
-	# # cm.plot(cmap = plt.cm.Greens,
-	# 	# number_label = True, 
-	# 	# plot_lib = "matplotlib")
+	# cm.plot(cmap = plt.cm.Greens,
+		# number_label = True, 
+		# plot_lib = "matplotlib")
 
-	# # plt.savefig(os.path.join("..","results","federated_skewed","global", f"fold_{int(fold)}_client_{idx}_cmplot_output.png"), 
-	# 	# facecolor = 'y', 
-	# 	# bbox_inches = "tight",
-	# 	# pad_inches = 0.3, 
-	# 	# transparent = True)
+	# plt.savefig(os.path.join("..","results","federated_skewed","global", f"fold_{int(fold)}_client_{idx}_cmplot_output.png"), 
+		# facecolor = 'y', 
+		# bbox_inches = "tight",
+		# pad_inches = 0.3, 
+		# transparent = True)
 
 
 ###############################################################################################################
@@ -732,31 +666,29 @@ if __name__ == '__main__':
 ###############################################################################################################
 
 
-# ######################################################################################################################
-# UNCOMMENT FOR RUNS
-# # ======================= Save Model ======================= #
-# 	if test_acc > best_acc:
-# 		best_acc = test_acc
-# 		# best_model_wts = copy.deepcopy(global_model.state_dict())
-# 		# torch.save(global_model.state_dict(), f'../save_new/fed_models/{global_model._get_name()}_{args.optimizer}.pth')
+# ======================= Save Model ======================= #
+	if test_acc > best_acc:
+		best_acc = test_acc
+		# best_model_wts = copy.deepcopy(global_model.state_dict())
+		# torch.save(global_model.state_dict(), f'../save_new/fed_models/{global_model._get_name()}_{args.optimizer}.pth')
 
 
-# 	history['test_acc'].append(test_acc)
-# 	history['test_loss'].append(test_loss)
-# 	history['train_acc'].append(train_accuracy)
-# 	history['train_loss'].append(train_loss)
+	history['test_acc'].append(test_acc)
+	history['test_loss'].append(test_loss)
+	history['train_acc'].append(train_accuracy)
+	history['train_loss'].append(train_loss)
 
-# 	df = pd.DataFrame(history)
+	df = pd.DataFrame(history)
 	
-# 	dfc = pd.DataFrame(history_c)
-# 	df.to_csv(os.path.join(f'{global_model._get_name()}_{args.optimizer}_{k}Folds_{args.epochs}GE_{args.local_ep}LE.csv'))
-# 	dfc.to_csv(os.path.join(f'{global_model._get_name()}_{args.optimizer}_{k}Folds_{args.epochs}GE_{args.local_ep}LE_Clients.csv'))
+	dfc = pd.DataFrame(history_c)
+	df.to_csv(os.path.join(f'{global_model._get_name()}_{args.optimizer}_{k}Folds_{args.epochs}GE_{args.local_ep}LE.csv'))
+	dfc.to_csv(os.path.join(f'{global_model._get_name()}_{args.optimizer}_{k}Folds_{args.epochs}GE_{args.local_ep}LE_Clients.csv'))
 	
-# 	FINAL_WEIGHTS = average_weights(AVG_WEIGHTS)
-# 	GLOBAL_MODEL.load_state_dict(FINAL_WEIGHTS)
-# 	torch.save(GLOBAL_MODEL.state_dict(),(os.path.join('skewed_results','global_results',f'{global_model._get_name()}_{args.optimizer}_FINAL_WEIGHTS.pth'))
+	FINAL_WEIGHTS = average_weights(AVG_WEIGHTS)
+	GLOBAL_MODEL.load_state_dict(FINAL_WEIGHTS)
+	torch.save(GLOBAL_MODEL.state_dict(),(os.path.join('skewed_results','global_results',f'{global_model._get_name()}_{args.optimizer}_FINAL_WEIGHTS.pth')))
  
 	
 
-# 	print('\n Total Run Time: {0:0.4f}'.format(time.time()-start_time))
+	print('\n Total Run Time: {0:0.4f}'.format(time.time()-start_time))
 	print(f"\n\n{'*'*50}\nDONE!\n{'*'*50}\n\n")
