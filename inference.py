@@ -39,7 +39,7 @@ def skin_cancer_iid_testing(dataset):
 	:param dataset:
 	:return: dict of image index
 	"""
-
+	dict_users = {}
 	dict_users[0] = [i for i in range(len(dataset))]
 
 	return dict_users
@@ -170,7 +170,7 @@ if __name__ == '__main__':
 	# train_set, skewed_datasets = build_train_set_lst()
 	test_set = build_test_set()
 
-	class_names =  [os.path.basename(i) for i in test_set[0].classes]
+	# class_names =  [os.path.basename(i) for i in test_set[0].classes]
 	# print(f"CLASS NAMES \n\n{class_names}\n\n")
 	# test_set = SkinCancer(os.path.join('../../skin_cancer_data_fed','test'), transform=None)
 
@@ -235,7 +235,7 @@ if __name__ == '__main__':
 ###############################################################################################################
 
 	if not os.path.exists(os.path.join('skewed_results','models',f'{model._get_name()}_{args.optimizer}_results','inference')):
-		os.makedirs(os.path.join('skewed_results','models',f'{model._get_name()}_{args.optimizer}_results','inference')
+		os.makedirs(os.path.join('skewed_results','models',f'{model._get_name()}_{args.optimizer}_results','inference'))
 
 	cm = pycm.ConfusionMatrix(y_t, y_p, digit = 5)
 	cm.stat(summary = True)
