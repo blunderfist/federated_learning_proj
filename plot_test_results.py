@@ -28,4 +28,5 @@ def main():
 	for metric in metrics:
 		plot_metric(df, model_name, metric, date_time)
 
-main()
+if __name__ == '__main__':
+	main()
