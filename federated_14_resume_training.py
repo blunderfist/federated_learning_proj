@@ -395,7 +395,8 @@ if __name__ == '__main__':
 
 
 	# GLOBAL_MODEL
-	global_model = model
+	GLOBAL_MODEL = model
+
 	# this is changing the output if its not a custom model
 	# our models have correct output size, pretrained do not
 	# custom = ['custom_EN_b0_v2', 'custom_EN_b0_v3']
@@ -409,16 +410,19 @@ if __name__ == '__main__':
 
 
 	# Set the model to train and send it to device.
-	global_model.to(device)
-	global_model.train()
+	GLOBAL_MODEL.to(device)
+	GLOBAL_MODEL.train()
 	
 	# load weights
 	PATH = os.path.join('skewed_results','models',f'{model._get_name()}_{args.optimizer}_results',f'{model._get_name()}_{args.optimizer}_FINAL_WEIGHTS.pth')
 
 	# global_weights = global_model.state_dict()
-	global_model.load_state_dict(torch.load(PATH))
+	GLOBAL_MODEL.load_state_dict(torch.load(PATH))
 
 	GLOBAL_MODEL_WEIGHTS = copy.deepcopy(global_model.state_dict())
+
+	global_model = GLOBAL_MODEL
+	global_model.load_state_dict(GLOBAL_MODEL_WEIGHTS)
 
 	train_loss, train_accuracy = [], []	
 	test_loss, test_accuracy = [], []
