@@ -394,24 +394,31 @@ if __name__ == '__main__':
 
 
 
-	GLOBAL_MODEL = model
-
+	# GLOBAL_MODEL
+	global_model = model
 	# this is changing the output if its not a custom model
 	# our models have correct output size, pretrained do not
-	custom = ['custom_EN_b0_v2', 'custom_EN_b0_v3']
-	if args.model not in custom:
-		old_fc = GLOBAL_MODEL.classifier.__getitem__(-1)
-		new_fc = nn.Linear(in_features = old_fc.in_features, out_features = 9, bias = True)
-		GLOBAL_MODEL.classifier.__setitem__(-1 , new_fc)
+	# custom = ['custom_EN_b0_v2', 'custom_EN_b0_v3']
+	# if args.model not in custom:
+	# 	old_fc = GLOBAL_MODEL.classifier.__getitem__(-1)
+	# 	new_fc = nn.Linear(in_features = old_fc.in_features, out_features = 9, bias = True)
+	# 	GLOBAL_MODEL.classifier.__setitem__(-1 , new_fc)
 	
+
+	# model.load_state_dict(torch.load(PATH))
+
+
 	# Set the model to train and send it to device.
-	GLOBAL_MODEL.to(device)
-	GLOBAL_MODEL.train()
+	global_model.to(device)
+	global_model.train()
 	
-	# copy weights
-	GLOBAL_MODEL_WEIGHTS = copy.deepcopy(GLOBAL_MODEL.state_dict())
-	
+	# load weights
+	PATH = os.path.join('skewed_results','models',f'{model._get_name()}_{args.optimizer}_results',f'{model._get_name()}_{args.optimizer}_FINAL_WEIGHTS.pth')
+
 	# global_weights = global_model.state_dict()
+	global_model.load_state_dict(torch.load(PATH))
+
+	GLOBAL_MODEL_WEIGHTS = copy.deepcopy(global_model.state_dict())
 
 	train_loss, train_accuracy = [], []	
 	test_loss, test_accuracy = [], []
@@ -424,17 +431,13 @@ if __name__ == '__main__':
 	history = {'train_loss': [], 'train_acc': [],
 			   'test_loss': [], 'test_acc': []}
 	history_c={'client_acc':[], 'client_loss':[]}
-				
-	global_model = GLOBAL_MODEL
 
 	best_acc = 0.0
 	AVG_WEIGHTS=[]
 
 	local_weights=[]
 	user_sets=[]
-		
-	global_model.load_state_dict(GLOBAL_MODEL_WEIGHTS)
-		
+			
 	# for saving results later
 	if not os.path.exists(os.path.join('skewed_results','models',f'{global_model._get_name()}_{args.optimizer}_results')):
 		os.makedirs(os.path.join('skewed_results','models',f'{global_model._get_name()}_{args.optimizer}_results'))
