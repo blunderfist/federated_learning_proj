@@ -29,8 +29,8 @@ class LocalUpdate(object):
         # self.dataloader = dataloader
         # self.trainloader, self.validloader, self.testloader = self.train_val_test(
         #     dataset, list(idxs))
-        # self.device = 'mps' if args.gpu else 'cpu'
-        self.device = 'cpu'# if args.gpu else 'cpu'
+        self.device = 'mps' #if args.gpu else 'cpu'
+        # self.device = 'cpu'# if args.gpu else 'cpu'
         # Default criterion set to NLL loss function
         self.criterion =torch.nn.CrossEntropyLoss().to(self.device)
         self.model = model

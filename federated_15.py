@@ -67,8 +67,8 @@ def test_inference(model, testloader):
 		device = 'mps'
 	else:
 		device = 'cpu'
-	# device = 'mps'
-	device = 'cpu'
+	device = 'mps'
+	# device = 'cpu'
 
 	criterion = nn.CrossEntropyLoss().to(device)
 	# testloader = DataLoader(test_dataset, batch_size=8,
@@ -302,10 +302,11 @@ if __name__ == '__main__':
 	# Default set to danica's computer so don't worry about this argument
 	# if I run on mine I'll set it to false, or if you run on another set --danica_comp False on cmd line
 	if args.danica_comp:
-		# device = 'mps'
+		device = 'mps'
 		device = 'cpu'		
 	else:
 		device = 'cpu'
+	device = 'mps'
 
 	# if args.gpu_id:
 	#     torch.cuda.set_device(args.gpu_id)
