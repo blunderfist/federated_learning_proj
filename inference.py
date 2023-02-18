@@ -59,8 +59,8 @@ def test_inference(model, testloader):
 		device = 'mps'
 	else:
 		device = 'cpu'
-	# device = 'mps'
-	device = 'cpu'
+	device = 'mps'
+	# device = 'cpu'
 
 	criterion = nn.CrossEntropyLoss().to(device)
 	# testloader = DataLoader(test_dataset, batch_size=8,
