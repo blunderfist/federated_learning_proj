@@ -200,17 +200,17 @@ if __name__ == '__main__':
 
 	# this is changing the output if its not a custom model
 	# our models have correct output size, pretrained do not
-	custom = ['custom_EN_b0_v2', 'custom_EN_b0_v3']
-	if args.model not in custom:
-		old_fc = model.classifier.__getitem__(-1)
-		new_fc = nn.Linear(in_features = old_fc.in_features, out_features = 9, bias = True)
-		model.classifier.__setitem__(-1 , new_fc)
+	# custom = ['custom_EN_b0_v2', 'custom_EN_b0_v3']
+	# if args.model not in custom:
+	# 	old_fc = model.classifier.__getitem__(-1)
+	# 	new_fc = nn.Linear(in_features = old_fc.in_features, out_features = 9, bias = True)
+	# 	model.classifier.__setitem__(-1 , new_fc)
 
 	# load weights
 	# only model params are saved so they are loaded after model is loaded
 	# path below should work for any model trained
 	# os.path.join('skewed_results','global_results',f'{global_model._get_name()}_{args.optimizer}_FINAL_WEIGHTS.pth'))
-	PATH = os.path.join('skewed_results','global_results',f'{model._get_name()}_{args.optimizer}_FINAL_WEIGHTS.pth')
+	PATH = os.path.join('skewed_results','global_results',f'{args.model}_{args.optimizer}_results',f'{args.model}_{args.optimizer}_FINAL_WEIGHTS.pth')
 	model.load_state_dict(torch.load(PATH))
 	
 	client_data = user_groups[0][:] # trying to copy all indexes from dataset for given client
@@ -234,17 +234,17 @@ if __name__ == '__main__':
 # PYCM SECTION INFERENCE
 ###############################################################################################################
 
-	if not os.path.exists(os.path.join('skewed_results','models',f'{model._get_name()}_{args.optimizer}_results','inference')):
-		os.makedirs(os.path.join('skewed_results','models',f'{model._get_name()}_{args.optimizer}_results','inference'))
+	if not os.path.exists(os.path.join('skewed_results','models',f'{args.model}_{args.optimizer}_results','inference')):
+		os.makedirs(os.path.join('skewed_results','models',f'{args.model}_{args.optimizer}_results','inference'))
 
 	cm = pycm.ConfusionMatrix(y_t, y_p, digit = 5)
 	cm.stat(summary = True)
 	to_save_as_a_file = cm.to_array()
 
-	cm.save_csv(os.path.join('skewed_results','models',f'{model._get_name()}_{args.optimizer}_results','inference'))
+	cm.save_csv(os.path.join('skewed_results','models',f'{args.model}_{args.optimizer}_results','inference'))
 
 	truth_vs_preds_df = pd.DataFrame({'y_true': y_t, 'y_pred': y_p})
-	truth_vs_preds_df.to_csv(os.path.join('skewed_results','models',f'{model._get_name()}_{args.optimizer}_results','inference', 'truth_v_preds_global.csv'))
+	truth_vs_preds_df.to_csv(os.path.join('skewed_results','models',f'{args.model}_{args.optimizer}_results','inference', 'truth_v_preds_global.csv'))
 
 
 ###############################################################################################################
