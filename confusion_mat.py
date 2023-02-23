@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, accuracy_score
 
 def main():
 	files = glob(os.path.join("skewed_results", "models", "*/","inference",'*.csv'))
@@ -21,6 +21,7 @@ def main():
 	    sns.heatmap(cm, annot=True)
 	    plt.savefig(os.path.join(save_path, f'{model_name}_inference.png'))
 	    print(f"Saved image to {os.path.join(save_path, f'{model_name}_inference.png')}")
+	    print(f"Accuracy Score for {model_name}: {accuracy_score(y_true, y_pred)}")
 
 if __name__=="__main__":
 	main()
