@@ -63,10 +63,10 @@ class LocalUpdate(object):
 
         # Set optimizer for the local updates
         if self.args.optimizer == 'sgd':
-            optimizer = torch.optim.SGD(self.model.parameters(), lr=self.args.lr,
+            optimizer = torch.optim.SGD(self.model.parameters(), lr = self.args.lr,
                                         momentum=0.5)
         elif self.args.optimizer == 'adamx':
-            optimizer = torch.optim.Adamax(self.model.parameters(), lr=0.001)
+            optimizer = torch.optim.Adamax(self.model.parameters(), lr = self.args.lr)
 
         for iter in range(self.args.local_ep):
             batch_loss = []

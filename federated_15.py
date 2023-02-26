@@ -511,11 +511,11 @@ if __name__ == '__main__':
 # 				# added [data_index] here too
 				train_dataset = torch.utils.data.Subset(train_set, train_sampler.indices)
 				test_set = torch.utils.data.Subset(train_set, test_sampler.indices)
-				test_loader = DataLoader(test_set, batch_size=16,shuffle=False)
+				test_loader = DataLoader(test_set, batch_size=args.local_bs,shuffle=False)
 
 
 
-				dataloader = DataLoader(train_set, batch_size=16, sampler=train_sampler)
+				dataloader = DataLoader(train_set, batch_size=args.local_bs, sampler=train_sampler)
 				print(f'Client Index__________{idx+1} __________')
 				if epoch == 0:
 					# print("epoch ==0: epoch is", epoch)

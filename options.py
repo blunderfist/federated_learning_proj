@@ -18,7 +18,7 @@ def args_parser():
     parser.add_argument('--frac', type=float, default=1,
                         help='the fraction of clients: C')
     
-    parser.add_argument('--local_ep', type=int, default=2,
+    parser.add_argument('--local_ep', type=int, default=5,
                         help="the number of local epochs: E")
     
     parser.add_argument('--local_bs', type=int, default=16,
@@ -31,7 +31,7 @@ def args_parser():
                         help='SGD momentum (default: 0.5)')
 
     # model arguments
-    parser.add_argument('--model', type=str, default='efficientnet', help='model name')
+    parser.add_argument('--model', type=str, default='custom_EN_b0_v2', help='model name')
    
 
     # other arguments
@@ -67,7 +67,7 @@ def args_parser():
     
     parser.add_argument('--seed', type=int, default=1, help='random seed')
 
-    parser.add_argument('--danica_comp', type=bool, default=True, help='running on danicas computer device = mps')
+    parser.add_argument('--danica_comp', type=bool, default=False, help='running on danicas computer device = mps')
 
     parser.add_argument('--freeze', type=bool, default=True, help='freeze layers for pretraining')
 
