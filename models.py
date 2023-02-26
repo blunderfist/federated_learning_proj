@@ -178,9 +178,9 @@ class Mod_EfficientNet_b0_v2(nn.Module):
         
         return x
 
-def custom_EN_b0_v2():
+def custom_EN_b0_v2(args):
     
-    model = Mod_EfficientNet_b0() #pretrained = True)
+    model = Mod_EfficientNet_b0_v2() #pretrained = True)
     # model.classifier[1].out_features = args.num_classes
     # summary(ENb0, (3,224,224))
     return model
