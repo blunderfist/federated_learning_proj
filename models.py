@@ -126,7 +126,7 @@ class Mod_EfficientNet_b0_v2(nn.Module):
         #  super(EfficientNet_b0, self).__init__() is used to inherit nn.Module used above.
         self.model = efficientnet_pytorch.EfficientNet.from_pretrained('efficientnet-b0')
         # self.swish_beta = 
-        self.conv1x1 = nn.Conv2d(16, 1024, 1)
+        self.conv1x1 = nn.Conv2d(1280, 1024, 1)
         # self.linear_1 = nn.Linear(1024 , 640)
         # self.dro_1 = nn.Sequential(
         #     # nn.BatchNorm1d(640),
@@ -149,8 +149,12 @@ class Mod_EfficientNet_b0_v2(nn.Module):
             nn.Linear(1024 , 640),
             nn.SiLU(),
             # nn.BatchNorm1d(512),
-            nn.Dropout(0.5),
+            nn.Dropout(0.8),
             nn.Linear(640 , 400),
+            nn.SiLU(),
+            # nn.BatchNorm1d(256),
+            nn.Dropout(0.5),
+            nn.Linear(400, 250),
             nn.SiLU(),
             # nn.BatchNorm1d(256),
             nn.Dropout(0.3),
