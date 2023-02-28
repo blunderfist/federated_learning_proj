@@ -68,7 +68,7 @@ def test_inference(model, testloader):
 	else:
 		device = 'cpu'
 	device = 'mps'
-	# device = 'cpu'
+	device = 'cpu'
 
 	criterion = nn.CrossEntropyLoss().to(device)
 	# testloader = DataLoader(test_dataset, batch_size=8,
@@ -306,7 +306,7 @@ if __name__ == '__main__':
 		device = 'cpu'		
 	else:
 		device = 'cpu'
-	device = 'mps'
+	# device = 'mps'
 
 	# if args.gpu_id:
 	#     torch.cuda.set_device(args.gpu_id)
@@ -489,21 +489,6 @@ if __name__ == '__main__':
 				val_idx = client_data[start_test:stop_test] # test set
 
 
-#                 print(f"get_train_set(client_idx): {get_train_set(idx)}")
-#                 # print(f"DATA: {client_data}")
-#                 print(f"DATA type: {type(client_data)}")
-#                 # print(f"DATA train_idx: {train_idx}")
-#                 # print(f"DATA val_idx: {val_idx}")
-				# print(f"\n\nDATA LEN: {len(client_data)}\n\n") # can help distinguish between dif selections of data, should be dif for all clients
-#                 print(f"FOLD SIZE: {fold_size}")
-#                 print(f"start_test: {start_test}")
-#                 print(f"stop_test: {stop_test}")
-#                 print(f"TYPE train_idx: {type(train_idx)}")
-#                 print(f"TYPE val_idx: {type(val_idx)}")
-#                 prints all of the indexes in the training dataset
-#                 different lengths for each set
-#                 print(f"TRAIN_IDX\n\n\n\n\n\n{train_idx}\n\n\n\n\n\n\n")
-
 
 				train_set = get_train_set(idx)
 				train_sampler = SubsetRandomSampler(train_idx)
@@ -557,19 +542,17 @@ if __name__ == '__main__':
 		# update global weights loading into model
 		global_model.load_state_dict(global_weights)
 		# torch.cuda.empty_cache()
-			
-		# if epoch != 0: # was == 1
-			# print("avg weights!!!: epoch is", epoch)
+
 		if not os.path.exists(os.path.join('fed_models')):
 			os.mkdir('fed_models')
 		torch.save(global_model.state_dict(), os.path.join(f'fed_models',f'{args.model}_E{epoch}_F{fold}.pth'))
 		AVG_WEIGHTS.append(global_model.state_dict())
 		print(f"{'#'*20}\n\t\t\tAveraging weights\n{'#'*20}\n\n")
-	# loss_avg = sum(local_losses) / len(local_losses)
-	# acc_avg = sum(local_acc) / len(local_acc)
-	# # acc_avg = sum
-	# train_loss.append(loss_avg)
-	# train_accuracy.append(acc_avg)
+	loss_avg = sum(local_losses) / len(local_losses)
+	acc_avg = sum(local_acc) / len(local_acc)
+	acc_avg = sum
+	train_loss.append(loss_avg)
+	train_accuracy.append(acc_avg)
 
 	# Test inference after completion of training
 	# torch.cuda.empty_cache()
@@ -608,13 +591,12 @@ if __name__ == '__main__':
 # END FINAL PYCM SECTION
 ###############################################################################################################
 
-	# model_path = os.path.join('skewed_results','models',f'{global_model._get_name()}_{args.optimizer}_results')
 
 # ======================= Save Model ======================= #
 	if test_acc > best_acc:
 		best_acc = test_acc
-		# best_model_wts = copy.deepcopy(global_model.state_dict())
-		# torch.save(global_model.state_dict(), f'../save_new/fed_models/{global_model._get_name()}_{args.optimizer}.pth')
+		best_model_wts = copy.deepcopy(global_model.state_dict())
+		torch.save(global_model.state_dict(), f'../save_new/fed_models/{global_model._get_name()}_{args.optimizer}.pth')
 
 
 	history['test_acc'].append(test_acc)
