@@ -562,7 +562,7 @@ if __name__ == '__main__':
 	if test_acc > best_acc:
 		best_acc = test_acc
 		best_model_wts = copy.deepcopy(global_model.state_dict())
-		torch.save(global_model.state_dict(), f'../save_new/fed_models/{global_model._get_name()}_{args.optimizer}.pth')
+		torch.save(global_model.state_dict(), os.path.join(model_path, f'{args.model}_{args.optimizer}.pth'))
 
 
 	history['test_acc'].append(test_acc)
