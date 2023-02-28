@@ -199,7 +199,7 @@ def build_train_set_lst():
 		train_set_lst.append(tmp_train_set)
 
 	skewed_lst = {k:v for k,v in zip(range(len(skewed_datasets)), train_set_lst)}
-	# print("skewed_lst",skewed_lst) # this will tell us what dataset is from which folder for sanity check
+
 	return train_set_lst, skewed_lst
 
 
@@ -210,9 +210,6 @@ def skin_cancer_skewed(dataset, num_users):
 	:param num_users:
 	:return: dict of image index
 	"""
-	# randomly shuffle skewed datasets
-	# print("datasets",dataset)
-	# np.random.shuffle(dataset)
 	# assign randomly shuffled datasets to users in dictionary
 	# num users must = number of datasets
 	dict_users = {k:v for k,v in zip(range(num_users), dataset)}
@@ -265,14 +262,6 @@ def splice(lst, start_test, stop_test):
 # END KFOLD CODE
 ###########################################################################################
 
-# this was useful early on trying to figure out why data was loading wrong, probably can delete if runs are smooth
-def sanity_check_datasets(clients, skewed_ds):
-	"""maps clients to dataset folders for santity checking all datasets are being used"""
-
-	print(f"clients:\t\t{clients}") # prints entire client folder indexes
-	print(f"clients keys:\t\t{clients.keys()}") # prints just the keys
-	print(f"skewed_ds:\t\t{skewed_ds}")
-
 
 ###########################################################################
 # Makes directories to save output if they don't exist yet   
@@ -322,39 +311,16 @@ if __name__ == '__main__':
 # changing the train set to be a list of training sets each from a skewed dataset
 # these will be accessed by indexing in the kfold below
 	train_set, skewed_datasets = build_train_set_lst()
-	# print(f"skewed_datasets{skewed_datasets}")
-	# print("\n\n\n\n\n\n\n\nprinting training set so i know what it looks like")
-	# for i in range(len(train_set)):
-	#     print(train_set[i])
-	#     print("len traingset",len(train_set),"\n\n\n\n\n\n\n\n\n")
-	# tmp = train_set[0]
-	# print("TRAIN SET",tmp.classes)
 
-
-
-	# print("train set 0",train_set)
 	class_names =  [os.path.basename(i) for i in train_set[0].classes]
-	# print(f"CLASS NAMES \n\n{class_names}\n\n")
-	# test_set = SkinCancer(os.path.join('../../skin_cancer_data_fed','test'), transform=None)
-
 
 ######################################################################################################################################
 # Clients get their data assigned
 ######################################################################################################################################
 	
-	# user_groups = skin_cancer_iid(train_set, 5) # was 2
 	user_groups = skin_cancer_skewed(train_set, args.num_users)
-	# print("user_groups type",type(user_groups))
-	# print("user_groups",user_groups)
-	# this is showing us which client has which dataset
-	# not easy to tell which is which but we can determine each is accounted for
-	# print(f"\n\nSkewed Dataset Ordering\n\n{[v for v in skewed_datasets.values()]}\n\n\n")
+
 ######################################################################################################################################
-
-#######################################################################
-# sanity_check_datasets(user_groups, skewed_datasets)
-#######################################################################
-
 
 	if args.model == 'efficientnet':
 		
@@ -370,7 +336,7 @@ if __name__ == '__main__':
 	elif args.model == 'custom_EN_b0':
 		model = custom_EN_b0(args)
 
-	elif args.model == 'custom_EN_b0_v2':
+	elif args.model == 'custom_EN_b0_v2': #args --model=custom_EN_b0_v2
 		model = custom_EN_b0_v2(args)
 
 	# elif args.model == 'custom_EN_b0_v3':
@@ -380,7 +346,7 @@ if __name__ == '__main__':
 ###################################################################################################################
 ### FREEZING WEIGHTS HERE
 ### defaults to True
-### disable freezing with --freeze False on cmd line
+### disable freezing with --freeze=False on cmd line
 ###################################################################################################################
 
 	if args.freeze:
